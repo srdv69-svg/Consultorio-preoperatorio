@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultorio Perioperatorio — H. Rawson</title>
+<style>
+  :root {
+    --bg:#f7f6f2;--surface:#ffffff;--surface2:#f0ede6;--border:#d8d4c8;--border2:#c0bcb0;
+    --text:#1a1916;--text2:#5a574e;--text3:#8a877e;--accent:#1a4a6b;--accent2:#2d6a9f;
+    --accent-light:#e3eef7;--success:#1a5e3a;--success-bg:#e3f2ea;--warn:#7a4a00;
+    --warn-bg:#fef3e0;--danger:#7a1a1a;--danger-bg:#fde8e8;--info:#1a3a6b;
+    --info-bg:#e3eaf7;--purple:#4a1a6b;--purple-bg:#f0e3f7;
+    --radius:8px;--radius-lg:12px;--font:'Georgia',serif;--font-ui:'Trebuchet MS',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font-ui);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;}
+  .app{display:flex;flex-direction:column;min-height:100vh;}
+  header{background:var(--accent);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:3px solid #0f2d44;}
+  .logo{width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:#fff;font-family:var(--font);flex-shrink:0;}
+  header h1{font-size:17px;font-weight:600;font-family:var(--font);}
+  header p{font-size:11px;opacity:0.75;margin-top:2px;}
+  .nav-steps{display:flex;gap:2px;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;}
+  .nav-step{padding:10px 14px;font-size:11px;cursor:pointer;border:none;background:transparent;color:var(--text2);white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.15s;font-family:var(--font-ui);}
+  .nav-step:hover{color:var(--accent);background:rgba(26,74,107,0.05);}
+  .nav-step.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface);font-weight:600;}
+  .nav-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);font-size:10px;font-weight:600;margin-right:5px;color:var(--text3);}
+  .nav-step.active .step-num{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .content{flex:1;padding:20px 24px;max-width:920px;width:100%;margin:0 auto;}
+  .panel{display:none;}.panel.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;}
+  .card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text2);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .card-title .icon{width:24px;height:24px;background:var(--accent-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .form-row.thirds{grid-template-columns:1fr 1fr 1fr;}
+  .form-row.full{grid-template-columns:1fr;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:12px;font-weight:600;color:var(--text2);}
+  .field input,.field select,.field textarea{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font-ui);background:var(--bg);color:var(--text);transition:border-color 0.15s;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent2);background:#fff;}
+  .field textarea{min-height:70px;resize:vertical;}
+  .option-btn{padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg);transition:all 0.15s;text-align:left;font-size:12px;font-family:var(--font-ui);color:var(--text);}
+  .option-btn:hover{border-color:var(--accent2);background:var(--accent-light);}
+  .option-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600;}
+  .option-btn .opt-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+  .option-btn .opt-desc{font-size:11px;color:var(--text3);line-height:1.4;}
+  .option-btn.selected .opt-desc{color:var(--accent2);}
+  .check-list{display:flex;flex-direction:column;gap:6px;}
+  .check-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg);transition:all 0.15s;font-size:12px;}
+  .check-item:hover{border-color:var(--accent2);background:var(--accent-light);}
+  .check-item input[type="checkbox"]{margin-top:2px;flex-shrink:0;accent-color:var(--accent);}
+  .check-item label{cursor:pointer;line-height:1.5;}
+  .score-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid;}
+  .chip-a{background:var(--success-bg);color:var(--success);border-color:#a8d5b8;}
+  .chip-b{background:var(--info-bg);color:var(--info);border-color:#a8bcdc;}
+  .chip-c{background:var(--warn-bg);color:var(--warn);border-color:#f0c87a;}
+  .chip-d{background:var(--danger-bg);color:var(--danger);border-color:#e8a0a0;}
+  .result-box{padding:14px 16px;border-radius:var(--radius);border-left:4px solid;margin-bottom:12px;}
+  .result-box.success{background:var(--success-bg);border-color:var(--success);}
+  .result-box.warn{background:var(--warn-bg);border-color:#c4820a;}
+  .result-box.danger{background:var(--danger-bg);border-color:var(--danger);}
+  .result-box.info{background:var(--info-bg);border-color:var(--accent2);}
+  .result-box.purple{background:var(--purple-bg);border-color:var(--purple);}
+  .result-box .rb-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+  .result-box .rb-text{font-size:12px;line-height:1.6;}
+  .btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+  .btn{padding:9px 18px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;font-size:13px;font-family:var(--font-ui);font-weight:600;transition:all 0.15s;}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn-primary:hover{background:var(--accent2);}
+  .btn-secondary{background:var(--surface);color:var(--text2);}
+  .btn-secondary:hover{background:var(--surface2);}
+  .btn-success{background:var(--success-bg);color:var(--success);border-color:var(--success);}
+  .section-header{margin-bottom:16px;}
+  .section-header h2{font-size:20px;font-family:var(--font);font-weight:600;color:var(--text);margin-bottom:4px;}
+  .section-header p{font-size:13px;color:var(--text2);}
+  .alert{padding:12px 14px;border-radius:var(--radius);border:1px solid;margin-bottom:12px;font-size:12px;display:flex;gap:8px;align-items:flex-start;}
+  .alert-warn{background:var(--warn-bg);border-color:#f0c87a;color:var(--warn);}
+  .alert-info{background:var(--info-bg);border-color:#a8bcdc;color:var(--info);}
+  .alert-danger{background:var(--danger-bg);border-color:#e8a0a0;color:var(--danger);}
+  .alert-success{background:var(--success-bg);border-color:#a8d5b8;color:var(--success);}
+  .vad-alert{background:#fff0f0;border:2px solid var(--danger);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;}
+  .vad-alert-title{font-size:15px;font-weight:700;color:var(--danger);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .vad-criteria{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .vad-tag{background:var(--danger-bg);border:1px solid var(--danger);border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--danger);}
+  .vad-options{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+  .vad-btn{padding:6px 10px;border:1px solid var(--border);border-radius:20px;cursor:pointer;background:var(--bg);font-size:11px;font-family:var(--font-ui);transition:all 0.15s;}
+  .vad-btn:hover{border-color:var(--accent2);}
+  .vad-btn.sel-ok{border-color:var(--success);background:var(--success-bg);color:var(--success);font-weight:600;}
+  .vad-btn.sel-alert{border-color:var(--danger);background:var(--danger-bg);color:var(--danger);font-weight:600;}
+  .beard-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .beard-alert{background:#fff0f0;border:2px solid var(--danger);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;}
+  .beard-alert-title{font-size:15px;font-weight:700;color:var(--danger);margin-bottom:8px;}
+  .stopbang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .caprini-section{margin-bottom:14px;}
+  .caprini-section-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:0.05em;margin-bottom:8px;padding:4px 8px;background:var(--surface2);border-radius:4px;}
+  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  table.med-table{width:100%;border-collapse:collapse;font-size:12px;}
+  table.med-table th{background:var(--surface2);padding:7px 10px;text-align:left;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);}
+  table.med-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.med-table tr:last-child td{border-bottom:none;}
+  table.med-table tr:hover td{background:var(--bg);}
+  .dasi-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;}
+  .dasi-row:last-child{border-bottom:none;}
+  .dasi-row label{flex:1;}
+  .dasi-row .dasi-val{font-size:11px;color:var(--text3);width:40px;text-align:center;flex-shrink:0;}
+  .dasi-row input[type=checkbox]{margin-right:10px;accent-color:var(--accent);}
+  .ant-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+  .ant-table th{background:var(--surface2);padding:7px 10px;text-align:left;font-weight:600;color:var(--text2);border:1px solid var(--border);}
+  .ant-table td{padding:6px 8px;border:1px solid var(--border);vertical-align:top;}
+  .ant-table td input,.ant-table td select{width:100%;padding:5px 7px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:var(--font-ui);background:var(--bg);color:var(--text);}
+  .ant-table td input:focus,.ant-table td select:focus{outline:none;border-color:var(--accent2);background:#fff;}
+  /* ALERGIAS */
+  .alergia-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+  .alergia-table th{background:#fff4f4;padding:7px 10px;text-align:left;font-weight:600;color:var(--danger);border:1px solid #e8a0a0;}
+  .alergia-table td{padding:6px 8px;border:1px solid var(--border);vertical-align:top;}
+  .alergia-table td input,.alergia-table td select{width:100%;padding:5px 7px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:var(--font-ui);background:var(--bg);color:var(--text);}
+  .alergia-table td input:focus,.alergia-table td select:focus{outline:none;border-color:var(--danger);background:#fff;}
+  #informe-output{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 32px;font-family:var(--font);line-height:1.8;}
+  #informe-output h2{font-size:22px;color:var(--accent);border-bottom:2px solid var(--accent-light);padding-bottom:8px;margin-bottom:16px;}
+  #informe-output h3{font-size:15px;color:var(--accent);margin:18px 0 8px;font-weight:600;}
+  #informe-output p{font-size:13px;margin-bottom:8px;}
+  #informe-output ul{margin:6px 0 10px 20px;font-size:13px;}
+  #informe-output li{margin-bottom:4px;}
+  .print-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+  .print-logo{font-size:28px;font-weight:bold;color:var(--accent);font-family:var(--font);}
+  .print-meta{font-size:11px;color:var(--text3);text-align:right;}
+  .flow-hint{background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--radius);padding:12px;font-size:12px;color:var(--text2);margin-bottom:12px;}
+  .vital-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+  .vital-label{font-size:12px;font-weight:600;color:var(--text2);min-width:140px;}
+  .vital-input{padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);width:90px;font-family:var(--font-ui);}
+  .vital-unit{font-size:11px;color:var(--text3);}
+  .vital-flag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;}
+  .vital-flag.normal{background:var(--success-bg);color:var(--success);}
+  .vital-flag.warn{background:var(--warn-bg);color:var(--warn);}
+  .vital-flag.danger{background:var(--danger-bg);color:var(--danger);}
+  .ninguno-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--success);background:var(--success-bg);color:var(--success);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;user-select:none;}
+  .ninguno-badge:hover{background:#c8ecd8;}
+  .ninguno-badge.active{background:var(--success);color:#fff;}
+  @media(max-width:600px){
+    .form-row,.form-row.thirds{grid-template-columns:1fr;}
+    .content{padding:12px;}
+    .lab-grid,.stopbang-grid,.beard-grid{grid-template-columns:1fr;}
+    .alergia-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .alergia-table thead{display:none;}
+    .alergia-table tbody tr{display:block;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;padding:8px;background:var(--bg);}
+    .alergia-table td{display:block;width:100%!important;padding:4px 2px;border:none;}
+    .alergia-table td::before{content:attr(data-label);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:2px;}
+    .alergia-table td input,.alergia-table td select{width:100%!important;}
+    .ant-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .ant-table thead{display:none;}
+    .ant-table tbody tr{display:block;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;padding:8px;background:var(--bg);}
+    .ant-table td{display:block;width:100%!important;padding:4px 2px;border:none;}
+    .ant-table td input,.ant-table td select{width:100%!important;}
+    header h1{font-size:14px;}
+    header p{font-size:10px;}
+    .card{padding:14px;}
+    .vital-label{min-width:110px;font-size:11px;}
+    .vital-input{width:70px;}
+  }
+  @media print{.nav-steps,header,.btn-row{display:none!important;}body{background:#fff;}.panel{display:block!important;}.panel:not(#panel-8){display:none!important;}#informe-output{border:none;padding:0;}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">P</div>
+  <div><h1>Consultorio de Medicina Perioperatoria</h1><p>Hospital Guillermo Rawson — Área de Anestesiología</p></div>
+</header>
+<div class="nav-steps">
+  <button class="nav-step active" onclick="goPanel(0)"><span class="step-num">1</span>Paciente</button>
+  <button class="nav-step" onclick="goPanel(1)"><span class="step-num">2</span>ASA / Grado</button>
+  <button class="nav-step" onclick="goPanel(2)"><span class="step-num">3</span>Examen Físico</button>
+  <button class="nav-step" onclick="goPanel(3)"><span class="step-num">4</span>Riesgo CV</button>
+  <button class="nav-step" onclick="goPanel(4)"><span class="step-num">5</span>Riesgo Resp.</button>
+  <button class="nav-step" onclick="goPanel(5)"><span class="step-num">6</span>Laboratorio</button>
+  <button class="nav-step" onclick="goPanel(6)"><span class="step-num">7</span>Medicación</button>
+  <button class="nav-step" onclick="goPanel(7)"><span class="step-num">8</span>Prehabilitación</button>
+  <button class="nav-step" onclick="goPanel(8)"><span class="step-num">9</span>Informe Final</button>
+</div>
+<div class="content">
+
+<!-- PANEL 0 -->
+<div class="panel active" id="panel-0">
+  <div class="section-header"><h2>Datos del Paciente</h2><p>Información general e identificación</p></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">👤</span>Identificación</div>
+    <div class="form-row">
+      <div class="field"><label>Apellido y nombre</label><input type="text" id="p_nombre" placeholder="Apellido, Nombre"></div>
+      <div class="field"><label>DNI / Historia clínica</label><input type="text" id="p_hc" placeholder="N° HC"></div>
+    </div>
+    <div class="form-row thirds">
+      <div class="field"><label>Fecha de nacimiento</label><input type="date" id="p_fnac" oninput="calcEdadDesdeFecha()"></div>
+      <div class="field"><label>Edad (años)</label><input type="number" id="p_edad" placeholder="65" min="0" max="120" oninput="limpiarFechaSiEdad()"></div>
+      <div class="field"><label>Sexo</label><select id="p_sexo"><option value="">—</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Peso (kg)</label><input type="number" id="p_peso" placeholder="kg" step="0.1"></div>
+      <div class="field"><label>Talla (cm)</label><input type="number" id="p_talla" placeholder="cm"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>IMC calculado</label><input type="text" id="p_imc" readonly></div>
+      <div class="field"><label>Clasificación IMC</label><input type="text" id="p_imc_clase" readonly></div>
+    </div>
+  </div>
+
+  <!-- ALERGIAS -->
+  <div class="card">
+    <div class="card-title" style="color:var(--danger);border-bottom-color:#e8a0a0;"><span class="icon" style="background:#fde8e8;">⚠️</span>Alergias e Hipersensibilidades</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Registre <strong>todas</strong> las alergias conocidas. Información crítica para la seguridad anestésica.</p>
+    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <span class="ninguno-badge" id="ninguno-alergias" onclick="toggleNingunos('alergias')">✓ Sin alergias conocidas (NARSA)</span>
+    </div>
+    <div id="alergias-container">
+      <div style="background:var(--warn-bg);border:1px solid #f0c87a;border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--warn);">
+        <strong>⚠ Alérgenos de relevancia anestésica crítica:</strong> Látex · Huevo/Soya (propofol) · Penicilina/Betalactámicos (profilaxis) · Opioides/Morfina · Contraste iodado · Relajantes musculares · Gelatinas/Coloides · Clorhexidina
+      </div>
+      <table class="alergia-table">
+        <thead><tr>
+          <th style="width:22%">Categoría</th>
+          <th style="width:22%">Sustancia específica</th>
+          <th style="width:22%">Reacción observada</th>
+          <th style="width:16%">Severidad</th>
+          <th style="width:12%">Documentada</th>
+          <th style="width:6%"></th>
+        </tr></thead>
+        <tbody id="alergia-tbody">
+          <tr>
+            <td data-label="Categoría"><select onchange="actualizarAlergiaBanner()">
+              <option value="">— Seleccionar —</option>
+              <optgroup label="Medicamentos">
+                <option value="Antibióticos Betalactámicos/Penicilina">Betalactámicos / Penicilina</option>
+                <option value="Antibióticos otros">Antibióticos — otros</option>
+                <option value="AINEs / Aspirina">AINEs / Aspirina</option>
+                <option value="Opioides / Morfina">Opioides / Morfina</option>
+                <option value="Relajantes musculares (rocuronio, succinilcolina)">Relajantes musculares</option>
+                <option value="Anestésicos locales">Anestésicos locales</option>
+                <option value="Propofol / excipientes (huevo, soya)">Propofol / excipientes</option>
+                <option value="Sulfamidas">Sulfamidas</option>
+                <option value="Heparina">Heparina</option>
+                <option value="Otros medicamentos">Otros medicamentos</option>
+              </optgroup>
+              <optgroup label="Sustancias anestésicas">
+                <option value="Látex (caucho natural)">Látex (caucho natural)</option>
+                <option value="Contraste iodado">Contraste iodado</option>
+                <option value="Gelatinas / coloides">Gelatinas / coloides</option>
+                <option value="Clorhexidina">Clorhexidina</option>
+              </optgroup>
+              <optgroup label="Alimentos">
+                <option value="Huevo">Huevo</option>
+                <option value="Soya / Lecitina de soja">Soya / Lecitina de soja</option>
+                <option value="Mariscos">Mariscos</option>
+                <option value="Frutas tropicales (cross-reactividad látex)">Frutas tropicales (látex)</option>
+                <option value="Nueces / frutos secos">Nueces / frutos secos</option>
+                <option value="Otros alimentos">Otros alimentos</option>
+              </optgroup>
+              <optgroup label="Otras">
+                <option value="Polen / rinitis alérgica">Polen / rinitis alérgica</option>
+                <option value="Picadura de insectos">Picadura de insectos</option>
+                <option value="Metales (níquel, cromo)">Metales (níquel, cromo)</option>
+                <option value="Adhesivos / apósitos">Adhesivos / apósitos</option>
+                <option value="Otro — especificar">Otro — especificar</option>
+              </optgroup>
+            </select></td>
+            <td data-label="Sustancia específica"><input type="text" placeholder="Ej: Amoxicilina..."></td>
+            <td data-label="Reacción observada"><select>
+              <option value="">—</option>
+              <option>Urticaria / Prurito</option><option>Angioedema</option><option>Eritema / Exantema</option>
+              <option>Broncoespasmo / Disnea</option><option>Hipotensión / Shock anafiláctico</option>
+              <option>Náuseas / Vómitos</option><option>Rinitis</option><option>Reacción local</option>
+              <option>Síndrome Stevens-Johnson / NET</option><option>Otra reacción</option>
+            </select></td>
+            <td data-label="Severidad"><select onchange="actualizarAlergiaBanner()">
+              <option value="">—</option><option value="leve">Leve</option>
+              <option value="moderada">Moderada</option><option value="grave">Grave / Anafilaxia</option>
+            </select></td>
+            <td data-label="Documentada"><select><option value="">—</option><option>Sí</option><option>No / Referida</option></select></td>
+            <td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-secondary" onclick="agregarFilaAlergia()" style="margin-top:8px;font-size:12px;padding:6px 14px;border-color:#e8a0a0;color:var(--danger);">+ Agregar alergia</button>
+      <div id="alergias-banner-result" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🏥</span>Cobertura médica</div>
+    <div class="form-row thirds">
+      <div class="field"><label>Obra Social / Prepaga</label><input type="text" id="p_os" placeholder="Ej: PAMI, OSDE..."></div>
+      <div class="field"><label>N° de afiliado</label><input type="text" id="p_afiliado"></div>
+      <div class="field"><label>Plan</label><input type="text" id="p_plan"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">🔬</span>Diagnóstico y cirugía propuesta</div>
+    <div class="form-row full"><div class="field"><label>Diagnóstico / Indicación quirúrgica</label><textarea id="p_dx" placeholder="Ej: Carcinoma de colon derecho. HTA y DM tipo 2..."></textarea></div></div>
+    <div class="form-row">
+      <div class="field"><label>Cirugía propuesta</label><input type="text" id="p_cirugia" placeholder="Ej: Hemicolectomía derecha laparoscópica"></div>
+      <div class="field"><label>Especialidad quirúrgica</label>
+        <select id="p_especialidad"><option value="">—</option><option>Cirugía General y Digestiva</option><option>Ortopedia y Traumatología</option><option>Ginecología</option><option>Urología</option><option>Cirugía Vascular</option><option>Cirugía Cardíaca</option><option>Cirugía Torácica</option><option>ORL</option><option>Oftalmología</option><option>Neurocirugía</option><option>Maxilofacial</option><option>Cirugía Pediátrica</option><option>Otra</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Urgencia</label>
+        <select id="p_urgencia"><option value="electiva">Electiva</option><option value="tiempo_sensible">Tiempo-sensible (1-6 sem.)</option><option value="urgente">Urgente (6-24 hs)</option><option value="emergencia">Emergencia (&lt;6 hs)</option></select>
+      </div>
+      <div class="field"><label>Fecha de evaluación</label><input type="date" id="p_fecha"></div>
+    </div>
+    <div class="form-row full"><div class="field"><label>Médico evaluador</label><input type="text" id="p_medico" placeholder="Nombre del anestesiólogo"></div></div>
+  </div>
+
+  <!-- ANTECEDENTES QUIRÚRGICOS -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🔪</span>Antecedentes Quirúrgicos Previos</div>
+    <div style="margin-bottom:10px;"><span class="ninguno-badge" id="ninguno-quirurgico" onclick="toggleNinguno('quirurgico')">✓ Ninguno</span></div>
+    <div id="antec-quirurgico-container">
+      <table class="ant-table"><thead><tr><th style="width:12%">Año</th><th style="width:38%">Procedimiento</th><th style="width:24%">Anestesia</th><th style="width:20%">Institución</th><th style="width:6%"></th></tr></thead>
+      <tbody id="antec-quirurgico-tbody"><tr>
+        <td><input type="text" placeholder="2019"></td>
+        <td><input type="text" placeholder="Apendicectomía laparoscópica"></td>
+        <td><select><option value="">—</option><option>General (AGE)</option><option>Raquídea</option><option>Epidural</option><option>Regional periférica</option><option>Sedación / MAC</option><option>Local</option><option>Desconocida</option></select></td>
+        <td><input type="text" placeholder="H. Rawson"></td>
+        <td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>
+      </tr></tbody></table>
+      <button class="btn btn-secondary" onclick="agregarFilaQuirurgico()" style="margin-top:8px;font-size:12px;padding:6px 14px;">+ Agregar cirugía</button>
+    </div>
+  </div>
+
+  <!-- COMPLICACIONES -->
+  <div class="card">
+    <div class="card-title"><span class="icon">⚠️</span>Antecedentes de Complicaciones Anestésicas o Quirúrgicas Previas</div>
+    <div style="margin-bottom:10px;"><span class="ninguno-badge" id="ninguno-complicaciones" onclick="toggleNinguno('complicaciones')">✓ Ninguno</span></div>
+    <div id="antec-complicaciones-container">
+      <table class="ant-table"><thead><tr><th style="width:10%">Año</th><th style="width:28%">Tipo</th><th style="width:24%">Detalle</th><th style="width:18%">UCI/RTI</th><th style="width:14%">Resuelto</th><th style="width:6%"></th></tr></thead>
+      <tbody id="antec-complicaciones-tbody"><tr>
+        <td><input type="text" placeholder="2018"></td>
+        <td><select><option value="">—</option>
+          <optgroup label="Vía aérea"><option>Intubación difícil</option><option>Intubación imposible</option><option>Ventilación difícil con máscara</option><option>Laringoespasmo</option><option>Broncoespasmo severo</option><option>Aspiración pulmonar</option></optgroup>
+          <optgroup label="Cardiovascular"><option>Paro cardiorrespiratorio</option><option>Arritmia grave</option><option>Hipotensión refractaria</option><option>IAM perioperatorio</option><option>TEP perioperatorio</option></optgroup>
+          <optgroup label="Alérgicas"><option>Anafilaxia grave</option><option>Hipertermia maligna</option><option>Síndrome serotoninérgico</option></optgroup>
+          <optgroup label="Neurológicas"><option>ACV perioperatorio</option><option>Delirium postoperatorio</option><option>Disfunción cognitiva</option></optgroup>
+          <optgroup label="Otras"><option>PONV intratable</option><option>Hemorragia mayor</option><option>Reintervención no planificada</option><option>Otra complicación</option></optgroup>
+        </select></td>
+        <td><input type="text" placeholder="Descripción..."></td>
+        <td><select><option value="">—</option><option>Sí</option><option>No</option></select></td>
+        <td><select><option value="">—</option><option>Sí, sin secuelas</option><option>Sí, con secuelas</option><option>Parcialmente</option><option>No resuelto</option></select></td>
+        <td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>
+      </tr></tbody></table>
+      <button class="btn btn-secondary" onclick="agregarFilaComplicacion()" style="margin-top:8px;font-size:12px;padding:6px 14px;">+ Agregar complicación</button>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="calcIMC();goPanel(1)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 1: ASA + GRADO + CFS + ABCD -->
+<div class="panel" id="panel-1">
+  <div class="section-header"><h2>Clasificación ASA, Grado Quirúrgico y Fragilidad</h2><p>Determina el Score ABCD de riesgo perioperatorio del Hospital Rawson</p></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">🏥</span>Clasificación ASA</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:12px;">Seleccione la categoría que mejor representa el estado sistémico del paciente <em>al momento de la evaluación</em>.</p>
+    <div id="asa-options" style="display:flex;flex-direction:column;gap:8px;">
+      <div class="option-btn" onclick="selASA(this,'1')">
+        <div class="opt-title">ASA 1 — Paciente sano</div>
+        <div class="opt-desc">Sin alteración orgánica, fisiológica, bioquímica o psiquiátrica identificable fuera de la patología quirúrgica. IMC &lt;30.<br>
+        <em>Ej: Cirugía de cataratas en paciente sano · Herniorrafia inguinal sin comorbilidades · Extracción de lipoma/quiste · Artroscopia de rodilla en deportista joven · Meniscectomía artroscópica · Circuncisión/fimosis · Varicocelectomía · Exéresis de lesión cutánea benigna · Biopsia de partes blandas superficiales.</em></div>
+      </div>
+      <div class="option-btn" onclick="selASA(this,'2')">
+        <div class="opt-title">ASA 2 — Alteración sistémica leve a moderada, sin limitación funcional</div>
+        <div class="opt-desc">Enfermedad sistémica bien controlada, sin repercusión funcional.<br>
+        <em>Ej: HTA controlada con medicación · DM tipo 2 bien controlada (HbA1c &lt;7%) · Tabaquismo activo sin EPOC · Obesidad grado I (IMC 30-35) · Anemia leve (Hb 10-12 g/dl) · Hipotiroidismo medicado compensado · Embarazo normal · SAOS leve con CPAP · Asma leve controlada · Arritmia bien controlada (FA en RS) · Hipercolesterolemia controlada · IAM o ACV &gt;3 meses sin secuelas funcionales · Alcohol social sin daño orgánico.</em></div>
+      </div>
+      <div class="option-btn" onclick="selASA(this,'3')">
+        <div class="opt-title">ASA 3 — Enfermedad sistémica grave con limitación funcional definida</div>
+        <div class="opt-desc">Una o más enfermedades graves, sin amenaza directa a la vida. Limitación funcional presente pero no incapacitante.<br>
+        <em>Ej: RCRI ≥2 · HTA grado 2 no controlada · DM insulinodependiente o con HbA1c 7-9% · EPOC moderado (GOLD 2, FEV1 50-80%) · ICC compensada NYHA II-III (FEyVI 40-50%) · IAM o ACV entre 3-6 meses · Obesidad severa IMC 35-39 · IRC en diálisis estable · Hepatopatía Child A/B compensada · Neoplasia activa sin metástasis · Marcapasos implantado · Epilepsia controlada · Enfermedad de Parkinson moderada · FA persistente controlada · Estenosis aórtica moderada asintomática · Historia de TEP con anticoagulación crónica · Esquizofrenia tratada.</em></div>
+      </div>
+      <div class="option-btn" onclick="selASA(this,'4')">
+        <div class="opt-title">ASA 4 — Enfermedad sistémica grave que amenaza la vida</div>
+        <div class="opt-desc">Enfermedades graves con amenaza constante para la vida. Descompensación significativa.<br>
+        <em>Ej: HTA grado 3 o crisis hipertensiva (TAS ≥180/TAD ≥110) · IAM o ACV en últimos 3 meses · Angina inestable / SCA · ICC NYHA IV o FEyVI &lt;25% · EPOC grave-muy grave (GOLD 3-4, FEV1 &lt;50%) · Insuficiencia respiratoria con O2 domiciliario · Obesidad mórbida IMC ≥40 · DM con complicaciones graves (nefropatía terminal, neuropatía severa) · Hepatopatía Child C / cirrosis descompensada · Sepsis activa · IRC grave sin diálisis · Coagulopatía grave · EAo severa sintomática (área &lt;1 cm²) · Hipertensión pulmonar severa.</em></div>
+      </div>
+      <div class="option-btn" onclick="selASA(this,'5')">
+        <div class="opt-title">ASA 5 — Paciente moribundo (sobrevida &lt;24 hs sin cirugía)</div>
+        <div class="opt-desc">Operación como última opción. Pronóstico sombrío con o sin intervención.<br>
+        <em>Ej: Rotura de aneurisma aórtico abdominal con shock · Trauma masivo con hemorragia incontrolable · Shock séptico refractario con falla multiorgánica · Isquemia mesentérica extensa con necrosis masiva · TEP masivo con PCR · TCE severo con herniación inminente · IAM con shock cardiogénico refractario · Insuficiencia hepática fulminante sin opción de trasplante.</em></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">⚔️</span>Grado de Complejidad Quirúrgica</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:12px;">Seleccione según agresividad tisular esperada, pérdida hemorrágica prevista y recursos postoperatorios necesarios.</p>
+    <div id="grado-options" style="display:flex;flex-direction:column;gap:8px;">
+      <div class="option-btn" onclick="selGrado(this,'1')">
+        <div class="opt-title">Grado 1 — Procedimientos menores / ambulatorios</div>
+        <div class="opt-desc">Escasa agresividad, sangrado esperado &lt;100 ml, alta el mismo día. Generalmente sin anestesia general o con sedación breve.<br>
+        <em>Ej: Fisurectomía anal · Herniorrafia inguinal unilateral · Hidrocelectomía · Fimosis/postectomía · Varicocelectomía · Extracción lipoma/quiste · Biopsia partes blandas · Cirugía cataratas (facoemulsificación) · Blefaroplastia · Corrección estrabismo · Drenaje absceso superficial · Artroscopia diagnóstica · Meniscectomía artroscópica · Carpal tunnel · Cirugía de várices bajo local · Cistoscopia · Vasectomía · Rinoscopia/polipectomía nasal · Biopsias de próstata ecoguiadas · Amígdalas/adenoides.</em></div>
+      </div>
+      <div class="option-btn" onclick="selGrado(this,'2')">
+        <div class="opt-title">Grado 2 — Procedimientos medianos / internación breve</div>
+        <div class="opt-desc">Sangrado moderado (100-400 ml), anestesia general o regional, internación 24-48 hs habitual.<br>
+        <em>Ej: Apendicectomía laparoscópica no complicada · Colecistectomía laparoscópica (colecistitis crónica) · Tiroidectomía total o parcial · Paratiroidectomía · Mastectomía simple/cuadrantectomía con ganglio centinela · Histerectomía abdominal o laparoscópica · Salpingo-ooforectomía · Miomectomía · Artroscopia de hombro con reconstrucción ligamentaria · Hallux valgus · RTUP · Nefrolitotomía percutánea · Cirugía de hemorroides (Milligan-Morgan) · Hernia umbilical/incisional pequeña · Fundoplicatura laparoscópica · Gastrectomía en manga sin complicaciones · Evacuación hematoma subdural crónico · Timpanoplastia · Mastoidectomía · Amputación menor (dedos del pie).</em></div>
+      </div>
+      <div class="option-btn" onclick="selGrado(this,'3')">
+        <div class="opt-title">Grado 3 — Procedimientos mayores / alta complejidad</div>
+        <div class="opt-desc">Pérdida Hb esperada &gt;4 g/dl, posibilidad de transfusión, internación &gt;48 hs, monitoreo postoperatorio intensivo o semi-intensivo frecuente.<br>
+        <em>Ej: Hemicolectomía derecha o izquierda · Resección anterior de recto · Gastrectomía subtotal o total por neoplasia · Esplenectomía electiva/urgente · Adrenalectomía laparoscópica · Prostatectomía radical retropúbica/robótica · Nefrectomía radical · Cistectomía radical con neovejiga · Histerectomía radical (Wertheim) · Hepatectomía parcial ≤3 segmentos · Bypass ilio-femoral o femoro-poplíteo · Endarterectomía carotídea · Artroplastia total de cadera o rodilla unilateral (PTR/PTC) · RAFI de fractura de pelvis/fémur · Laringectomía total · Glossectomía total · Disección radical de cuello · Lobectomía pulmonar en bajo riesgo · Amputación por encima de rodilla · Craniotomía sin CEC.</em></div>
+      </div>
+      <div class="option-btn" onclick="selGrado(this,'4')">
+        <div class="opt-title">Grado 4 — Procedimientos muy relevantes / máxima complejidad</div>
+        <div class="opt-desc">UCI postoperatoria planificada, caída Hb &gt;5 g/dl esperable, CEC posible, riesgo de falla multiorgánica. Monitoreo hemodinámico avanzado (Swan-Ganz, PiCCO, TEE).<br>
+        <em>Ej: Duodenopancreatectomía cefálica (Whipple) · Hepatectomía mayor (≥4 segmentos/trisegmentectomía) · Trasplante hepático/renal/cardíaco/pulmonar · Bypass coronario con CEC · Recambio valvular aórtico/mitral/tricúspide abierto · TAVI · Corrección cardiopatías congénitas complejas · Cirugía aorta torácica/toracoabdominal · Reparación disección aórtica tipo A · Neumonectomía en riesgo elevado · Esofaguectomía transtorácica/transhiatal · Exenteración pelviana · Cirugía tumor base de cráneo · Craniectomía descompresiva con edema refractario · Separación gemelos siameses · Cirugía gran quemado (cobertura masiva) · Tumor retroperitoneal gigante pediátrico.</em></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">🧓</span>Escala de Fragilidad Clínica de Rockwood (CFS)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Seleccione el nivel que mejor describe el estado del paciente. Especialmente importante en mayores de 70 años.</p>
+    <div id="cfs-options" style="display:flex;flex-direction:column;gap:6px;">
+      <div class="option-btn" onclick="selCFS(this,1)"><div class="opt-title">CFS 1 — Muy activo / en forma</div><div class="opt-desc">Robusto, activo, energético. Hace ejercicio regularmente. Se encuentra entre los más activos para su edad.</div></div>
+      <div class="option-btn" onclick="selCFS(this,2)"><div class="opt-title">CFS 2 — Bien</div><div class="opt-desc">Sin síntomas activos de enfermedad, pero menos activo que CFS 1. Ejercicio ocasional o estacional.</div></div>
+      <div class="option-btn" onclick="selCFS(this,3)"><div class="opt-title">CFS 3 — Manejando bien</div><div class="opt-desc">Síntomas médicos bien controlados pero no ejercita activamente. Limitado a caminar y actividades del hogar.</div></div>
+      <div class="option-btn" onclick="selCFS(this,4)"><div class="opt-title">CFS 4 — Vulnerable (sin dependencia)</div><div class="opt-desc">No depende de otros pero frecuentemente refiere cansancio. Síntomas limitan actividades.</div></div>
+      <div class="option-btn" onclick="selCFS(this,5)"><div class="opt-title">CFS 5 — Levemente frágil</div><div class="opt-desc">Dependencia parcial en actividades instrumentales (finanzas, transporte, medicamentos, compras).</div></div>
+      <div class="option-btn" onclick="selCFS(this,6)"><div class="opt-title">CFS 6 — Moderadamente frágil</div><div class="opt-desc">Necesita ayuda en actividades dentro y fuera del hogar. Sube escaleras con dificultad o necesita ayuda en el baño.</div></div>
+      <div class="option-btn" onclick="selCFS(this,7)"><div class="opt-title">CFS 7 — Gravemente frágil</div><div class="opt-desc">Completamente dependiente en cuidado personal, pero clínicamente estable.</div></div>
+      <div class="option-btn" onclick="selCFS(this,8)"><div class="opt-title">CFS 8 — Muy gravemente frágil</div><div class="opt-desc">Completamente dependiente, cercano al final de vida.</div></div>
+      <div class="option-btn" onclick="selCFS(this,9)"><div class="opt-title">CFS 9 — Terminal</div><div class="opt-desc">Enfermedad terminal. Expectativa de vida &lt;6 meses.</div></div>
+    </div>
+    <div id="cfs-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="card" id="abcd-result-card" style="display:none;">
+    <div class="card-title"><span class="icon">📊</span>Clasificación de Riesgo ABCD — Resultado</div>
+    <div id="abcd-result"></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(0)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(2)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 2: EXAMEN FÍSICO -->
+<div class="panel" id="panel-2">
+  <div class="section-header"><h2>Examen Físico Preanestésico</h2><p>Signos vitales, vía aérea y hallazgos físicos</p></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">💓</span>Signos Vitales</div>
+    <div id="vitals-alerts"></div>
+    <div class="vital-row"><span class="vital-label">Presión arterial</span><input type="number" class="vital-input" id="sv_tas" placeholder="TAS" oninput="evalVitals()"><span class="vital-unit">/</span><input type="number" class="vital-input" id="sv_tad" placeholder="TAD" oninput="evalVitals()"><span class="vital-unit">mmHg</span><span id="flag_ta" class="vital-flag" style="display:none;"></span></div>
+    <div class="vital-row"><span class="vital-label">Frecuencia cardíaca</span><input type="number" class="vital-input" id="sv_fc" placeholder="lpm" oninput="evalVitals()"><span class="vital-unit">lpm</span><span id="flag_fc" class="vital-flag" style="display:none;"></span></div>
+    <div class="vital-row"><span class="vital-label">Frecuencia respiratoria</span><input type="number" class="vital-input" id="sv_fr" placeholder="rpm" oninput="evalVitals()"><span class="vital-unit">rpm</span><span id="flag_fr" class="vital-flag" style="display:none;"></span></div>
+    <div class="vital-row"><span class="vital-label">Temperatura</span><input type="number" class="vital-input" id="sv_temp" placeholder="°C" step="0.1" oninput="evalVitals()"><span class="vital-unit">°C</span><span id="flag_temp" class="vital-flag" style="display:none;"></span></div>
+    <div class="vital-row"><span class="vital-label">SatO2 aire ambiente</span><input type="number" class="vital-input" id="sv_sat" placeholder="%" oninput="evalVitals()"><span class="vital-unit">%</span><span id="flag_sat" class="vital-flag" style="display:none;"></span></div>
+    <div class="form-row" style="margin-top:12px;">
+      <div class="field"><label>Ritmo cardíaco</label><select id="sv_ritmo"><option value="">—</option><option>Regular, sin soplos</option><option>Regular con soplo sistólico</option><option>Regular con soplo diastólico — PATOLÓGICO</option><option>Irregular (FA / arritmia)</option><option>Bradicardia sinusal</option></select></div>
+      <div class="field"><label>Auscultación pulmonar</label><select id="sv_pulm"><option value="">—</option><option>Murmullo vesicular conservado bilateral</option><option>Rales crepitantes bases</option><option>Sibilancias espiratorias</option><option>Roncus difusos</option><option>Hipoventilación generalizada</option><option>Murmullo abolido</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Edemas periféricos</label><select id="sv_edema"><option value="">—</option><option>Ausentes</option><option>Leve (+/+++)</option><option>Moderado (++/+++)</option><option>Grave (+++/+++)</option></select></div>
+      <div class="field"><label>Estado neurológico</label><select id="sv_neuro"><option value="">—</option><option>Orientado en tiempo, espacio y persona</option><option>Desorientación leve</option><option>Deterioro cognitivo / demencia</option><option>Somnolencia / sopor</option><option>Agitación psicomotriz</option></select></div>
+    </div>
+    <div class="form-row full"><div class="field"><label>Comentarios examen físico</label><textarea id="sv_comentarios" placeholder="Ej: Paciente en buen estado general, lúcido, colaborador..."></textarea></div></div>
+  </div>
+
+  <!-- VAD INTUBACIÓN -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🫁</span>Evaluación de Vía Aérea — Predictores de Dificultad en Intubación (VAD)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Los hallazgos marcados con ⚠ contribuyen al score de VAD.</p>
+    <div class="field" style="margin-bottom:14px;"><label>Mallampati</label><div class="vad-options" id="mp-opts"><button class="vad-btn" onclick="selVAD('mp','I','ok',this)">Clase I — Se ven paladar, úvula, pilares</button><button class="vad-btn" onclick="selVAD('mp','II','ok',this)">Clase II — Paladar, úvula, base pilares</button><button class="vad-btn" onclick="selVAD('mp','III','alert',this)">⚠ Clase III — Solo paladar y base úvula</button><button class="vad-btn" onclick="selVAD('mp','IV','alert',this)">⚠ Clase IV — No se ve paladar blando</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Apertura bucal</label><div class="vad-options" id="ab-opts"><button class="vad-btn" onclick="selVAD('ab','≥5cm','ok',this)">≥ 5 cm — Normal</button><button class="vad-btn" onclick="selVAD('ab','3.5-5cm','ok',this)">3.5–5 cm — Grado II</button><button class="vad-btn" onclick="selVAD('ab','<3.5cm','alert',this)">⚠ &lt; 3.5 cm — Grado III</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Distancia tiromentoniana (Patil-Aldreti)</label><div class="vad-options" id="dtm-opts"><button class="vad-btn" onclick="selVAD('dtm','>6.5cm','ok',this)">&gt; 6.5 cm — Grado I: sin dificultad</button><button class="vad-btn" onclick="selVAD('dtm','6-6.5cm','alert',this)">⚠ 6–6.5 cm — Grado II</button><button class="vad-btn" onclick="selVAD('dtm','<6cm','alert',this)">⚠ &lt; 6 cm — Grado III: muy difícil</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Test de mordida del labio superior</label><div class="vad-options" id="tm-opts"><button class="vad-btn" onclick="selVAD('tm','Clase 1','ok',this)">Clase 1 — Por encima del bermellón</button><button class="vad-btn" onclick="selVAD('tm','Clase 2','ok',this)">Clase 2 — Alcanza bermellón parcialmente</button><button class="vad-btn" onclick="selVAD('tm','Clase 3','alert',this)">⚠ Clase 3 — No puede morder</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Movilidad cervical</label><div class="vad-options" id="mc-opts"><button class="vad-btn" onclick="selVAD('mc','Normal >80°','ok',this)">Normal — Extensión &gt; 80°</button><button class="vad-btn" onclick="selVAD('mc','Limitada 30-80°','alert',this)">⚠ Limitada — 30–80°</button><button class="vad-btn" onclick="selVAD('mc','Muy limitada <30°','alert',this)">⚠ Muy limitada — &lt; 30°</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Longitud y circunferencia del cuello</label><div class="vad-options" id="lc-opts"><button class="vad-btn" onclick="selVAD('lc','Normal','ok',this)">Normal</button><button class="vad-btn" onclick="selVAD('lc','Cuello corto','alert',this)">⚠ Cuello corto</button><button class="vad-btn" onclick="selVAD('lc','Circunf >40cm','alert',this)">⚠ Circunferencia &gt; 40 cm</button><button class="vad-btn" onclick="selVAD('lc','Cuello corto + circunf >40cm','alert',this)">⚠ Cuello corto + circunf &gt; 40 cm</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Estado dentario</label><div class="vad-options" id="dt-opts"><button class="vad-btn" onclick="selVAD('dt','Normal','ok',this)">Dentición completa</button><button class="vad-btn" onclick="selVAD('dt','Piezas sueltas','ok',this)">Piezas sueltas (notificar)</button><button class="vad-btn" onclick="selVAD('dt','Desdentado sin prótesis','alert',this)">⚠ Desdentado sin prótesis</button><button class="vad-btn" onclick="selVAD('dt','Protrusión incisivos','alert',this)">⚠ Protrusión marcada incisivos</button><button class="vad-btn" onclick="selVAD('dt','Prótesis removible','ok',this)">Prótesis removible (retirar)</button></div></div>
+    <div class="field" style="margin-bottom:14px;"><label>Antecedentes de dificultad en vía aérea</label><div class="vad-options" id="ant-opts"><button class="vad-btn" onclick="selVAD('ant','Sin antecedentes','ok',this)">Sin antecedentes</button><button class="vad-btn" onclick="selVAD('ant','Historia IOT difícil','alert',this)">⚠ Historia de intubación difícil</button><button class="vad-btn" onclick="selVAD('ant','Historia VMD','alert',this)">⚠ Historia de ventilación difícil</button><button class="vad-btn" onclick="selVAD('ant','SAOS conocido','alert',this)">⚠ SAOS conocido</button><button class="vad-btn" onclick="selVAD('ant','Irradiación/cirugía cuello','alert',this)">⚠ Cirugía/irradiación cuello</button></div></div>
+    <div id="vad-result" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- BEARD -->
+  <div class="card">
+    <div class="card-title"><span class="icon">😮‍💨</span>Score BEARD — Predictores de Dificultad en Ventilación con Máscara Facial (VMD)</div>
+    <div class="alert alert-info" style="margin-bottom:14px;">
+      <div><strong>Protocolo BEARD</strong> (Beard / Edentulous / Age &gt;55 / Restricted mouth / Difficult airway history). Cada ítem suma 1 punto. <strong>Score ≥2 → Alta probabilidad de VMD.</strong> Preparar plan de rescate antes de la inducción.</div>
+    </div>
+    <div class="beard-grid">
+      <label class="check-item">
+        <input type="checkbox" id="beard_b" onchange="calcBEARD()">
+        <label for="beard_b"><strong>B — Barba / Beard</strong><br><span style="font-size:11px;color:var(--text3);">Presencia de barba, bigote u otro vello facial que impida el sellado hermético de la máscara facial. El sello deficiente impide ventilación eficaz. Si se rasura en el preoperatorio inmediato, el riesgo se reduce. Incluye vello facial abundante o barba espesa.</span></label>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="beard_e" onchange="calcBEARD()">
+        <label for="beard_e"><strong>E — Edentulous / Desdentado</strong><br><span style="font-size:11px;color:var(--text3);">Edentulismo parcial significativo o total sin prótesis colocada. La pérdida de soporte óseo alveolar colapsa las mejillas e impide el sellado. Solución: mantener la prótesis durante la inducción si es posible para facilitar el sellado de la máscara.</span></label>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="beard_a" onchange="calcBEARD()">
+        <label for="beard_a"><strong>A — Age &gt;55 años</strong><br><span style="font-size:11px;color:var(--text3);">Mayor edad implica pérdida de elasticidad tisular, mayor compliance faríngea y mayor tendencia al colapso de la vía aérea superior durante la apnea post-inducción. También se asocia a mayor prevalencia de SAOS no diagnosticado y pérdida de dentición.</span></label>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="beard_r" onchange="calcBEARD()">
+        <label for="beard_r"><strong>R — Restricted mouth / Apertura restringida</strong><br><span style="font-size:11px;color:var(--text3);">Apertura bucal &lt;3.5 cm. Dificulta la inserción de cánula orofaríngea (Guedel) y el posicionamiento de la máscara. Causas: artritis TMJ, esclerodermia, microstomía, cirugía o radioterapia previa en cara/cuello, trismus.</span></label>
+      </label>
+      <label class="check-item" style="grid-column: 1 / -1;">
+        <input type="checkbox" id="beard_d" onchange="calcBEARD()">
+        <label for="beard_d"><strong>D — Difficult airway history / Antecedentes de VAD o SAOS</strong><br><span style="font-size:11px;color:var(--text3);">Antecedente documentado de dificultad en ventilación con máscara en anestesias previas, SAOS moderado-grave (AHI ≥15/h), obesidad grave (IMC ≥35), cuello corto o circunferencia cervical &gt;40 cm, estridor, masas cervicales o mediastínicas, paquetes musculares hipertróficos. Estos pacientes tienen alto riesgo de obstrucción durante la apnea.</span></label>
+      </label>
+    </div>
+    <div id="beard-result" style="margin-top:14px;"></div>
+    <div style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:var(--radius);font-size:12px;color:var(--text2);">
+      <strong>Conducta según score BEARD:</strong>
+      <ul style="margin-top:6px;margin-left:16px;line-height:1.9;">
+        <li><strong>Score 0:</strong> Bajo riesgo. Inducción estándar.</li>
+        <li><strong>Score 1:</strong> Riesgo moderado. Preparar cánula Guedel. Optimizar posición (rampa/HELP). Máscara laríngea disponible.</li>
+        <li><strong>Score ≥2:</strong> Alto riesgo. Plan de rescate obligatorio (ML supraglótica de 2° generación). Videolaringoscopio en sala. Considerar inducción en ventilación espontánea. Notificar al equipo y documentar.</li>
+        <li><strong>Score ≥3 o CICO previsible:</strong> Intubación vigil bajo fibroanestesia tópica. Cirujano disponible para vía aérea quirúrgica (cricotirotomía). Kit CICO verificado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STOP-BANG -->
+  <div class="card">
+    <div class="card-title"><span class="icon">😴</span>Score STOP-BANG — Screening de SAOS</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Cada respuesta afirmativa suma 1 punto. Alto riesgo = 5 o más puntos.</p>
+    <div class="stopbang-grid">
+      <label class="check-item"><input type="checkbox" id="sb1" onchange="calcSTOPBANG()"><label for="sb1"><strong>S</strong>noring — ¿Ronca fuerte?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb2" onchange="calcSTOPBANG()"><label for="sb2"><strong>T</strong>ired — ¿Cansancio/somnolencia diurna frecuente?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb3" onchange="calcSTOPBANG()"><label for="sb3"><strong>O</strong>bserved — ¿Alguien vio que deja de respirar?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb4" onchange="calcSTOPBANG()"><label for="sb4"><strong>P</strong>ressure — ¿Tratamiento para HTA?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb5" onchange="calcSTOPBANG()"><label for="sb5"><strong>B</strong>MI — ¿IMC mayor a 35 kg/m²?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb6" onchange="calcSTOPBANG()"><label for="sb6"><strong>A</strong>ge — ¿Más de 50 años?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb7" onchange="calcSTOPBANG()"><label for="sb7"><strong>N</strong>eck — ¿Circunferencia de cuello &gt; 40 cm?</label></label>
+      <label class="check-item"><input type="checkbox" id="sb8" onchange="calcSTOPBANG()"><label for="sb8"><strong>G</strong>ender — ¿Sexo masculino?</label></label>
+    </div>
+    <div id="stopbang-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(1)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(3)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 3: RIESGO CV -->
+<div class="panel" id="panel-3">
+  <div class="section-header"><h2>Evaluación de Riesgo Cardiovascular</h2><p>Protocolo AHA/ACC 2014 — 5 escalones</p></div>
+  <div class="card"><div class="card-title"><span class="icon">❤️</span>Escalón 1 — Urgencia de la cirugía</div><div id="esc1-result"></div></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">❤️</span>Escalón 2 — Condición cardíaca activa</div>
+    <div class="flow-hint">Si alguna condición está presente → <strong>posponer cirugía electiva</strong> e interconsultar cardiología.</div>
+    <div class="check-list">
+      <label class="check-item"><input type="checkbox" name="ca" value="sca" onchange="evalCardio()"><label>SCA: angina inestable o severa, IAM reciente (&lt;3 meses)</label></label>
+      <label class="check-item"><input type="checkbox" name="ca" value="ic" onchange="evalCardio()"><label>IC descompensada: NYHA IV, IC de novo</label></label>
+      <label class="check-item"><input type="checkbox" name="ca" value="arritmia" onchange="evalCardio()"><label>Arritmia significativa: BAV Mobitz II o 3°, TV sintomática, FA RV no controlada</label></label>
+      <label class="check-item"><input type="checkbox" name="ca" value="valvula" onchange="evalCardio()"><label>Valvulopatía grave: EAo severa o EM severa sintomática</label></label>
+    </div>
+    <div id="esc2-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="card"><div class="card-title"><span class="icon">❤️</span>Escalón 3 — Riesgo inherente a la cirugía</div><div id="esc3-result"></div></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">❤️</span>Escalón 4 — Capacidad funcional (DASI)</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Marque las actividades que el paciente puede realizar.</p>
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);">
+      <div class="dasi-row" style="font-weight:600;color:var(--text2);font-size:11px;background:var(--surface2);"><span>Actividad</span><span class="dasi-val">Pts</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d1" onchange="calcDASI()"><label for="d1">Autocuidado: alimentarse, vestirse, bañarse, usar el baño</label><span class="dasi-val">2.75</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d2" onchange="calcDASI()"><label for="d2">Caminar dentro y alrededor de su casa</label><span class="dasi-val">1.75</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d3" onchange="calcDASI()"><label for="d3">Caminar 1-2 cuadras sin pendiente</label><span class="dasi-val">2.75</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d4" onchange="calcDASI()"><label for="d4">Subir un tramo de escaleras (2 pisos) sin detenerse</label><span class="dasi-val">5.50</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d5" onchange="calcDASI()"><label for="d5">Correr una pequeña distancia</label><span class="dasi-val">8.00</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d6" onchange="calcDASI()"><label for="d6">Trabajo liviano: sacudir, lavar platos</label><span class="dasi-val">2.70</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d7" onchange="calcDASI()"><label for="d7">Trabajo moderado: aspirar, barrer, acarrear comestibles</label><span class="dasi-val">3.50</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d8" onchange="calcDASI()"><label for="d8">Trabajo pesado: fregar pisos, mover muebles</label><span class="dasi-val">8.00</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d9" onchange="calcDASI()"><label for="d9">Jardinería: rastrillar, desmalezar, cortadora de pasto</label><span class="dasi-val">4.50</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d10" onchange="calcDASI()"><label for="d10">Tener relaciones sexuales</label><span class="dasi-val">5.25</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d11" onchange="calcDASI()"><label for="d11">Actividad recreacional moderada: baile, tenis dobles, golf</label><span class="dasi-val">6.00</span></div>
+      <div class="dasi-row"><input type="checkbox" id="d12" onchange="calcDASI()"><label for="d12">Deportes intensos: natación, tenis, fútbol, básquet</label><span class="dasi-val">7.50</span></div>
+    </div>
+    <div id="dasi-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">❤️</span>Escalón 5 — RCRI (Lee)</div>
+    <div class="check-list">
+      <label class="check-item"><input type="checkbox" id="rcri1" onchange="calcRCRI()"><label for="rcri1">Cirugía de alto riesgo (grado 2, 3 o 4)</label></label>
+      <label class="check-item"><input type="checkbox" id="rcri2" onchange="calcRCRI()"><label for="rcri2">Historia de ACV / AIT</label></label>
+      <label class="check-item"><input type="checkbox" id="rcri3" onchange="calcRCRI()"><label for="rcri3">Historia de cardiopatía isquémica</label></label>
+      <label class="check-item"><input type="checkbox" id="rcri4" onchange="calcRCRI()"><label for="rcri4">Diabetes mellitus que requiere insulina</label></label>
+      <label class="check-item"><input type="checkbox" id="rcri5" onchange="calcRCRI()"><label for="rcri5">Historia de insuficiencia cardíaca</label></label>
+      <label class="check-item"><input type="checkbox" id="rcri6" onchange="calcRCRI()"><label for="rcri6">Creatinina &gt; 2 mg/dl</label></label>
+    </div>
+    <div id="rcri-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">💊</span>Stent coronario</div>
+    <div class="form-row">
+      <div class="field"><label>¿Tiene stent?</label><select id="stent_tipo" onchange="evalStent()"><option value="">No/No aplica</option><option value="balon">Angioplastia con balón</option><option value="convencional">Stent convencional (bare metal)</option><option value="medicado">Stent medicado (drug eluting)</option></select></div>
+      <div class="field"><label>Tiempo desde procedimiento</label><select id="stent_tiempo" onchange="evalStent()"><option value="">—</option><option value="lt14">&lt;14 días</option><option value="14_30">14-30 días</option><option value="30_365">30 días - 1 año</option><option value="gt365">&gt;1 año</option></select></div>
+    </div>
+    <div id="stent-result"></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(2)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(4)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 4: RESP -->
+<div class="panel" id="panel-4">
+  <div class="section-header"><h2>Evaluación de Riesgo Respiratorio</h2></div>
+  <div class="card"><div class="card-title"><span class="icon">🫁</span>Indicaciones</div><div class="check-list"><label class="check-item"><input type="checkbox" id="resp_ind1"><label for="resp_ind1">Cirugía de resección pulmonar</label></label><label class="check-item"><input type="checkbox" id="resp_ind2"><label for="resp_ind2">EPOC conocido</label></label><label class="check-item"><input type="checkbox" id="resp_ind3"><label for="resp_ind3">Asma no controlada</label></label><label class="check-item"><input type="checkbox" id="resp_ind4"><label for="resp_ind4">Disnea de causa respiratoria</label></label><label class="check-item"><input type="checkbox" id="resp_ind5"><label for="resp_ind5">Tabaquismo activo o &lt;4 semanas de abstinencia</label></label></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🫁</span>Gasometría arterial</div><div class="form-row thirds"><div class="field"><label>PaO2 (mmHg)</label><input type="number" id="pao2" placeholder="85" onchange="evalResp()"></div><div class="field"><label>PaCO2 (mmHg)</label><input type="number" id="paco2" placeholder="40" onchange="evalResp()"></div><div class="field"><label>SatO2 (%)</label><input type="number" id="sato2" placeholder="96" onchange="evalResp()"></div></div><div id="gaso-result"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🫁</span>Espirometría</div><div class="form-row"><div class="field"><label>FEV1 absoluto (L)</label><input type="number" id="fev1_abs" step="0.01" placeholder="2.1" onchange="evalEspiro()"></div><div class="field"><label>FEV1 (% predicho)</label><input type="number" id="fev1_pct" placeholder="78" onchange="evalEspiro()"></div></div><div class="form-row"><div class="field"><label>DLCO (% predicho)</label><input type="number" id="dlco_pct" placeholder="65" onchange="evalEspiro()"></div><div class="field"><label>Clasificación GOLD</label><select id="gold_epoc" onchange="evalEspiro()"><option value="">No EPOC</option><option value="1">GOLD 1 — Leve (FEV1 &gt;80%)</option><option value="2">GOLD 2 — Moderado (50-80%)</option><option value="3">GOLD 3 — Grave (30-50%)</option><option value="4">GOLD 4 — Muy grave (&lt;30%)</option></select></div></div><div id="espiro-result"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🫁</span>FEV1/DLCO ppo (resección pulmonar)</div><div class="form-row"><div class="field"><label>FEV1 ppo (%)</label><input type="number" id="fev1ppo" placeholder="55" onchange="evalPPO()"></div><div class="field"><label>DLCO ppo (%)</label><input type="number" id="dlcoppo" placeholder="50" onchange="evalPPO()"></div></div><div id="ppo-result"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🫁</span>Tests funcionales cardiopulmonares</div><div class="form-row"><div class="field"><label>VO2 máx (ml/kg/min)</label><input type="number" id="vo2max" step="0.1" placeholder="18" onchange="evalVO2()"></div><div class="field"><label>Test de subida de escaleras</label><select id="sct" onchange="evalVO2()"><option value="">No realizado</option><option value="0">Incapaz de subir 1 piso</option><option value="1">1-2 pisos</option><option value="3">3-4 pisos</option><option value="5">5 o más pisos</option></select></div></div><div class="form-row"><div class="field"><label>Test 6 min marcha (m)</label><input type="number" id="t6min" placeholder="380" onchange="evalVO2()"></div></div><div id="vo2-result"></div></div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(3)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(5)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 5: LAB -->
+<div class="panel" id="panel-5">
+  <div class="section-header"><h2>Laboratorio y Estudios Complementarios</h2></div>
+  <div class="card"><div class="card-title"><span class="icon">🧪</span>Hemograma y coagulación</div><div class="lab-grid"><div class="field"><label>Hemoglobina (g/dl)</label><input type="number" id="lab_hb" step="0.1" placeholder="11.5" onchange="evalAnemia()"></div><div class="field"><label>Hematocrito (%)</label><input type="number" id="lab_hto" step="0.1" placeholder="34"></div><div class="field"><label>VCM (fL)</label><input type="number" id="lab_vcm" step="0.1" placeholder="82" onchange="evalVCM()"></div><div class="field"><label>Leucocitos (x10³/µL)</label><input type="number" id="lab_leuco" step="0.1" placeholder="7.5"></div><div class="field"><label>Plaquetas (x10³/µL)</label><input type="number" id="lab_plaq" placeholder="220"></div><div class="field"><label>RIN</label><input type="number" id="lab_rin" step="0.01" placeholder="1.2"></div><div class="field"><label>Reticulocitos (%)</label><input type="number" id="lab_retic" step="0.01" placeholder="1.5"></div><div class="field"><label>Ácido fólico (ng/ml)</label><input type="number" id="lab_folico" step="0.1" placeholder="8"></div></div><div id="anemia-result" style="margin-top:12px;"></div><div id="vcm-result" style="margin-top:8px;"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🧪</span>Metabolismo del hierro</div><div class="lab-grid"><div class="field"><label>Ferritina (ng/ml)</label><input type="number" id="lab_ferritina" step="0.1" placeholder="25" onchange="evalHierro()"></div><div class="field"><label>IST (%)</label><input type="number" id="lab_ist" step="0.1" placeholder="18" onchange="evalHierro()"></div><div class="field"><label>Hierro sérico (µg/dl)</label><input type="number" id="lab_hierro" placeholder="55"></div><div class="field"><label>PCR (mg/dl)</label><input type="number" id="lab_pcr" step="0.1" placeholder="3.2" onchange="evalHierro()"></div></div><div id="hierro-result" style="margin-top:12px;"></div><div id="hierro-ev-result" style="margin-top:8px;"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🧪</span>Bioquímica general</div><div class="lab-grid"><div class="field"><label>Glucemia ayunas (mg/dl)</label><input type="number" id="lab_gluc" placeholder="105" onchange="evalGluc()"></div><div class="field"><label>HbA1c (%)</label><input type="number" id="lab_hba1c" step="0.1" placeholder="7.2" onchange="evalGluc()"></div><div class="field"><label>Creatinina (mg/dl)</label><input type="number" id="lab_creat" step="0.01" placeholder="1.1"></div><div class="field"><label>Urea (mg/dl)</label><input type="number" id="lab_urea" placeholder="35"></div><div class="field"><label>Albúmina (g/dl)</label><input type="number" id="lab_alb" step="0.1" placeholder="3.8"></div><div class="field"><label>Vitamina B12 (pg/ml)</label><input type="number" id="lab_b12" placeholder="320"></div><div class="field"><label>Sodio (mEq/L)</label><input type="number" id="lab_na" placeholder="138"></div><div class="field"><label>Potasio (mEq/L)</label><input type="number" id="lab_k" step="0.1" placeholder="4.1"></div></div><div id="gluc-result" style="margin-top:12px;"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🧪</span>Child-Pugh (si hepatopatía)</div><div class="lab-grid"><div class="field"><label>Bilirrubina total</label><select id="cp_bili" onchange="calcChildPugh()"><option value="0">—</option><option value="1">&lt;2 mg/dl (1)</option><option value="2">2-3 mg/dl (2)</option><option value="3">&gt;3 mg/dl (3)</option></select></div><div class="field"><label>Albúmina sérica</label><select id="cp_alb" onchange="calcChildPugh()"><option value="0">—</option><option value="1">&gt;3.5 g/dl (1)</option><option value="2">2.8-3.5 g/dl (2)</option><option value="3">&lt;2.8 g/dl (3)</option></select></div><div class="field"><label>TP/RIN</label><select id="cp_tp" onchange="calcChildPugh()"><option value="0">—</option><option value="1">RIN &lt;1.7 (1)</option><option value="2">RIN 1.7-2.3 (2)</option><option value="3">RIN &gt;2.3 (3)</option></select></div><div class="field"><label>Ascitis</label><select id="cp_ascitis" onchange="calcChildPugh()"><option value="0">—</option><option value="1">Ausente (1)</option><option value="2">Leve-moderada (2)</option><option value="3">Grave/refractaria (3)</option></select></div><div class="field"><label>Encefalopatía</label><select id="cp_encef" onchange="calcChildPugh()"><option value="0">—</option><option value="1">Ausente (1)</option><option value="2">Grado I-II (2)</option><option value="3">Grado III-IV (3)</option></select></div></div><div id="childpugh-result" style="margin-top:12px;"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🖥️</span>Estudios complementarios</div><div class="form-row"><div class="field"><label>ECG</label><input type="text" id="est_ecg" placeholder="Ritmo sinusal normal / BCRI"></div><div class="field"><label>FEyVI (%)</label><input type="number" id="est_fevi" placeholder="55" onchange="evalFEVI()"></div></div><div class="form-row"><div class="field"><label>Ecocardiograma</label><textarea id="est_eco" placeholder="HVI moderada, FEyVI 55%..."></textarea></div><div class="field"><label>Ergometría</label><textarea id="est_ergometria" placeholder="Negativa para isquemia, 8 METs..."></textarea></div></div><div class="form-row"><div class="field"><label>Rx Tórax</label><input type="text" id="est_rx" placeholder="Normal / Cardiomegalia..."></div><div class="field"><label>TAC / Otro</label><input type="text" id="est_tac" placeholder="TAC tórax-abdomen..."></div></div><div class="form-row full"><div class="field"><label>Otros estudios</label><textarea id="est_otros"></textarea></div></div><div id="fevi-result"></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🧪</span>PONS — Screening nutricional</div><p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Si al menos UNA es afirmativa → Riesgo Nutricional</p><div class="check-list"><label class="check-item"><input type="checkbox" id="pons1" onchange="evalPONS()"><label for="pons1">IMC &lt;18.5 (o &lt;20 si &gt;65 años)</label></label><label class="check-item"><input type="checkbox" id="pons2" onchange="evalPONS()"><label for="pons2">Pérdida de peso &gt;10% en 6 meses o &gt;5% en 3 meses</label></label><label class="check-item"><input type="checkbox" id="pons3" onchange="evalPONS()"><label for="pons3">Disminución ingesta &gt;50% en la última semana</label></label><label class="check-item"><input type="checkbox" id="pons4" onchange="evalPONS()"><label for="pons4">Albúmina &lt;3 g/dl</label></label></div><div id="pons-result" style="margin-top:10px;"></div></div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(4)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(6)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 6: MEDICACIÓN -->
+<div class="panel" id="panel-6">
+  <div class="section-header"><h2>Medicación Habitual y Manejo Perioperatorio</h2></div>
+  <div class="card"><div class="card-title"><span class="icon">💊</span>Medicamentos actuales</div><div id="med-list"><div class="med-row" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;align-items:end;"><div class="field"><label>Medicamento</label><input type="text" placeholder="Ej: Enalapril..."></div><div class="field"><label>Dosis</label><input type="text" placeholder="10 mg/día"></div><div class="field"><label>Indicación</label><input type="text" placeholder="HTA"></div><div class="field"><label>Manejo</label><select><option value="">—</option><option>Continuar</option><option>Suspender</option><option>Ajustar dosis</option><option>Consultar especialista</option></select></div></div></div><button class="btn btn-secondary" onclick="addMedRow()" style="margin-top:6px;font-size:12px;padding:6px 14px;">+ Agregar</button></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">⚠️</span>Guía rápida de manejo perioperatorio</div>
+    <div class="alert alert-info" style="margin-bottom:12px;">Basado en guías ASA, AHA/ACC y ASRA.</div>
+    <table class="med-table"><thead><tr><th>Medicamento</th><th>Recomendación</th><th>Detalle</th></tr></thead><tbody>
+      <tr style="background:var(--success-bg);"><td><strong>Beta bloqueantes</strong></td><td>✅ CONTINUAR</td><td>Suspensión brusca causa isquemia. Mantener hasta el día de la cirugía.</td></tr>
+      <tr style="background:var(--success-bg);"><td><strong>Estatinas</strong></td><td>✅ CONTINUAR</td><td>Reducen riesgo CV perioperatorio.</td></tr>
+      <tr style="background:var(--success-bg);"><td><strong>Antidepresivos/Ansiolíticos</strong></td><td>✅ CONTINUAR</td><td>No suspender. Ajustar plan anestésico (IMAOs).</td></tr>
+      <tr style="background:var(--success-bg);"><td><strong>Antiepilépticos</strong></td><td>✅ CONTINUAR</td><td>Riesgo de convulsiones si se suspenden.</td></tr>
+      <tr style="background:var(--success-bg);"><td><strong>Corticoides</strong></td><td>✅ CONTINUAR + cobertura</td><td>Evaluar cobertura de estrés quirúrgico con hidrocortisona.</td></tr>
+      <tr style="background:var(--success-bg);"><td><strong>AAS (prevención 2°)</strong></td><td>✅ CONTINUAR</td><td>Mantener en stent, ACV, IAM. Suspender solo en neurocirugía.</td></tr>
+      <tr style="background:var(--warn-bg);"><td><strong>IECA / ARA-II</strong></td><td>⚠ CONSIDERAR suspensión</td><td>Suspender 12-24 hs antes en procedimientos prolongados.</td></tr>
+      <tr style="background:var(--warn-bg);"><td><strong>Furosemida</strong></td><td>⚠ SUSPENDER el día de cirugía</td><td>Tiazidas pueden continuarse.</td></tr>
+      <tr style="background:var(--warn-bg);"><td><strong>AAS (prevención 1°)</strong></td><td>⚠ SUSPENDER 5-7 días</td><td>Sin historia de stent/ACV/IAM.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Metformina</strong></td><td>🛑 SUSPENDER el día</td><td>No necesario posponer si función renal normal.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Hipoglucemiantes orales</strong></td><td>🛑 SUSPENDER el día</td><td>Todos los antidiabéticos orales.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Clopidogrel</strong></td><td>🛑 SUSPENDER 7 días</td><td>Excepto stent medicado &lt;6 meses o bare metal &lt;1 mes.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Warfarina</strong></td><td>🛑 SUSPENDER 5 días</td><td>Controlar RIN el día de la cirugía.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>HBPM terapéutica</strong></td><td>🛑 SUSPENDER 24 hs</td><td>Profiláctica: 12 hs. Reiniciar 12-24 hs postop si hemostasia OK.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Dabigatran/Rivaroxaban</strong></td><td>🛑 SUSPENDER 3-5 días</td><td>Dabigatran: 4-5 días (6 días si IR). Rivaroxaban: 3-5 días.</td></tr>
+      <tr style="background:var(--danger-bg);"><td><strong>Sildenafil y similares</strong></td><td>🛑 SUSPENDER 24 hs</td><td>Hipotensión grave con nitratos.</td></tr>
+      <tr style="background:var(--warn-bg);"><td><strong>Insulina NPH (DM tipo I)</strong></td><td>⚠ REDUCIR a 1/3</td><td>Mañana de cirugía: 1/3 dosis habitual.</td></tr>
+      <tr style="background:var(--warn-bg);"><td><strong>Insulina NPH (DM tipo II)</strong></td><td>⚠ REDUCIR 50%</td><td>Mitad de la dosis habitual de NPH.</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="card-title"><span class="icon">🩸</span>Puente con HBPM</div><p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Indicado en pacientes con anticoagulación crónica de ALTO RIESGO trombótico:</p><div class="check-list" style="margin-bottom:10px;"><label class="check-item"><input type="checkbox" id="puente1" onchange="evalPuente()"><label for="puente1">Válvula mecánica en posición mitral o aórtica tipo bola/disco</label></label><label class="check-item"><input type="checkbox" id="puente2" onchange="evalPuente()"><label for="puente2">ACV o AIT en los últimos 3-6 meses</label></label><label class="check-item"><input type="checkbox" id="puente3" onchange="evalPuente()"><label for="puente3">Fibrilación auricular con CHAD score ≥5</label></label><label class="check-item"><input type="checkbox" id="puente4" onchange="evalPuente()"><label for="puente4">TEV reciente (últimos 3 meses)</label></label><label class="check-item"><input type="checkbox" id="puente5" onchange="evalPuente()"><label for="puente5">Trombofilia severa</label></label></div><div id="puente-result"></div></div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(5)">← Atrás</button><button class="btn btn-primary" onclick="goPanel(7)">Continuar →</button></div>
+</div>
+
+<!-- PANEL 7: PREHABILITACIÓN -->
+<div class="panel" id="panel-7">
+  <div class="section-header"><h2>Plan de Prehabilitación</h2><p>Optimización preoperatoria multimodal — ERAS / Fast Track</p></div>
+  <div class="card"><div class="card-title"><span class="icon">💪</span>Capacidad funcional basal</div><div class="form-row"><div class="field"><label>TUG (segundos)</label><input type="number" id="ph_tug" step="0.1" placeholder="12"></div><div class="field"><label>Test 6 min marcha (m)</label><input type="number" id="ph_6min" placeholder="380"></div></div><div class="form-row full"><div class="field"><label>Plan de ejercicios prescrito</label><textarea id="ph_ejercicio" placeholder="Aeróbico moderado 30 min/3 días + fortalecimiento muscular 2 días/semana..."></textarea></div></div></div>
+  <div class="card">
+    <div class="card-title"><span class="icon">🩸</span>Score de CAPRINI — Riesgo TEV</div>
+    <div class="caprini-section"><div class="caprini-section-title">1 punto cada uno</div><div class="check-list"><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Edad 41–60 años</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Cirugía menor programada</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Historia de cirugía mayor (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Várices</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Enfermedad inflamatoria intestinal</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Edema en MMII</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Obesidad (IMC &gt;25)</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>IAM</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>ICC (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Sepsis (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Reposo &gt;72 hs</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>ACO / terapia hormonal</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Embarazo / puerperio</label></label><label class="check-item"><input type="checkbox" class="cap1" onchange="calcCAPRINI()"><label>Abortos espontáneos</label></label></div></div>
+    <div class="caprini-section"><div class="caprini-section-title">2 puntos cada uno</div><div class="check-list"><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Edad 61–74 años</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Cirugía artroscópica</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Neoplasia maligna</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Cirugía mayor (&gt;45 min)</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Laparoscopia (&gt;45 min)</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Reposo &gt;72 hs (no quirúrgico)</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Inmovilización enyesada</label></label><label class="check-item"><input type="checkbox" class="cap2" onchange="calcCAPRINI()"><label>Acceso venoso central</label></label></div></div>
+    <div class="caprini-section"><div class="caprini-section-title">3 puntos cada uno</div><div class="check-list"><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Edad ≥75 años</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Historia de TEV</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Historia familiar de TEV</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Factor V Leiden positivo</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Protrombina G20210A positivo</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Homocisteína elevada</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Anticoagulante lúpico</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>Anticuerpos anticardiolipina</label></label><label class="check-item"><input type="checkbox" class="cap3" onchange="calcCAPRINI()"><label>TIH</label></label></div></div>
+    <div class="caprini-section"><div class="caprini-section-title">5 puntos cada uno</div><div class="check-list"><label class="check-item"><input type="checkbox" class="cap5" onchange="calcCAPRINI()"><label>ACV (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap5" onchange="calcCAPRINI()"><label>Artroplastia electiva MMII</label></label><label class="check-item"><input type="checkbox" class="cap5" onchange="calcCAPRINI()"><label>Fractura cadera/pelvis/pierna (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap5" onchange="calcCAPRINI()"><label>Trauma múltiple (&lt;1 mes)</label></label><label class="check-item"><input type="checkbox" class="cap5" onchange="calcCAPRINI()"><label>Lesión medular aguda (&lt;1 mes)</label></label></div></div>
+    <div id="caprini-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="card"><div class="card-title"><span class="icon">🥗</span>Intervención nutricional</div><div class="form-row"><div class="field"><label>IMC</label><input type="text" id="ph_imc" readonly></div><div class="field"><label>Albúmina (g/dl)</label><input type="number" id="ph_alb" step="0.1" placeholder="3.5"></div></div><div class="form-row full"><div class="field"><label>Intervención nutricional indicada</label><textarea id="ph_nutricion" placeholder="Derivación nutricionista. Suplemento proteico..."></textarea></div></div><div class="form-row"><div class="field"><label>Ayuno — Sólidos</label><input type="text" value="6 horas antes" readonly></div><div class="field"><label>Ayuno — Líquidos claros</label><input type="text" value="2 horas antes" readonly></div></div><div class="alert alert-info">Carga de carbohidratos: 200-400 ml con ≥50 g (maltodextrina) 2-2.5 hs antes (excepto DM tipo 1).</div></div>
+  <div class="card"><div class="card-title"><span class="icon">🧠</span>Optimización psicológica</div><div class="form-row full"><div class="field"><label>Intervención psicológica indicada</label><textarea id="ph_psico" placeholder="Ej: Se detecta ansiedad moderada. Derivar a psicólogo..."></textarea></div></div></div>
+  <div class="card"><div class="card-title"><span class="icon">🚭</span>Hábitos tóxicos</div><div class="form-row"><div class="field"><label>Tabaquismo</label><select id="ph_tabaco"><option value="no">No fumador</option><option value="exfumador">Exfumador (&gt;4 semanas)</option><option value="activo">Fumador activo — suspender &gt;4 semanas preop</option><option value="reciente">Abstinencia &lt;4 semanas — riesgo aumentado</option></select></div><div class="field"><label>Alcohol</label><select id="ph_alcohol"><option value="no">No bebe / mínimo</option><option value="moderado">Consumo moderado</option><option value="excesivo">Consumo excesivo — suspender preop</option></select></div></div></div>
+  <div class="card"><div class="card-title"><span class="icon">💊</span>Premedicación y profilaxis</div><div class="form-row"><div class="field"><label>Premedicación ansiolítica</label><select id="ph_benzos"><option value="no">No se indica</option><option value="corta">BDZ acción corta si necesario</option><option value="si">Indicada</option></select></div><div class="field"><label>Profilaxis antibiótica</label><input type="text" id="ph_antibiotico" placeholder="Cefazolina 2g IV 30 min antes de incisión"></div></div></div>
+  <div class="card"><div class="card-title"><span class="icon">📝</span>Interconsultas y recomendaciones</div><div class="form-row full"><div class="field"><label>Interconsultas requeridas</label><textarea id="ph_interconsultas" placeholder="Cardiología (RCRI 3), Neumología (EPOC GOLD 3)..."></textarea></div></div><div class="form-row full"><div class="field"><label>Recomendaciones adicionales</label><textarea id="ph_otras" placeholder="Suspender AAS 7 días previo si no stent..."></textarea></div></div></div>
+  <div class="btn-row"><button class="btn btn-secondary" onclick="goPanel(6)">← Atrás</button><button class="btn btn-primary" onclick="generarInforme();goPanel(8)">Generar Informe Final →</button></div>
+</div>
+
+<!-- PANEL 8: INFORME -->
+<div class="panel" id="panel-8">
+  <div class="section-header"><h2>Informe Perioperatorio</h2></div>
+  <div class="btn-row" style="margin-bottom:16px;">
+    <button class="btn btn-primary" onclick="generarInforme()">⟳ Regenerar</button>
+    <button class="btn btn-success" onclick="window.print()">🖨 Imprimir / PDF</button>
+    <button class="btn btn-secondary" onclick="goPanel(7)">← Atrás</button>
+  </div>
+  <div id="informe-output"><p style="color:var(--text3);font-family:var(--font-ui);">Complete los pasos anteriores y presione "Generar Informe Final".</p></div>
+</div>
+
+</div></div>
+<script>
+var state={asa:null,grado:null,abcd:null,cfs:null,dasiScore:0,mets:0,rcri:0,stopbang:0,caprini:0,beard:0,urgencia:'electiva',condicionActiva:false,vad:{},ningunoCirugias:false,ningunoComplics:false,ningunoAlergias:false};
+
+function goPanel(n){document.querySelectorAll('.panel').forEach(function(p,i){p.classList.toggle('active',i===n);});document.querySelectorAll('.nav-step').forEach(function(b,i){b.classList.toggle('active',i===n);});window.scrollTo({top:0,behavior:'smooth'});if(n===3)initCardio();if(n===7){document.getElementById('ph_imc').value=document.getElementById('p_imc').value;}}
+
+function calcEdadDesdeFecha(){var f=document.getElementById('p_fnac').value;if(!f)return;var h=new Date(),n=new Date(f);if(isNaN(n.getTime()))return;var e=h.getFullYear()-n.getFullYear();if(h.getMonth()-n.getMonth()<0||(h.getMonth()-n.getMonth()===0&&h.getDate()<n.getDate()))e--;if(e>=0&&e<=130)document.getElementById('p_edad').value=e;}
+function limpiarFechaSiEdad(){document.getElementById('p_fnac').value='';}
+
+function toggleNinguno(tipo){
+  if(tipo==='quirurgico'){state.ningunoCirugias=!state.ningunoCirugias;document.getElementById('ninguno-quirurgico').classList.toggle('active',state.ningunoCirugias);document.getElementById('antec-quirurgico-container').style.display=state.ningunoCirugias?'none':'block';}
+  else if(tipo==='complicaciones'){state.ningunoComplics=!state.ningunoComplics;document.getElementById('ninguno-complicaciones').classList.toggle('active',state.ningunoComplics);document.getElementById('antec-complicaciones-container').style.display=state.ningunoComplics?'none':'block';}
+}
+function toggleNingunos(tipo){
+  if(tipo==='alergias'){state.ningunoAlergias=!state.ningunoAlergias;document.getElementById('ninguno-alergias').classList.toggle('active',state.ningunoAlergias);document.getElementById('alergias-container').style.display=state.ningunoAlergias?'none':'block';}
+}
+
+function actualizarAlergiaBanner(){
+  var rows=document.querySelectorAll('#alergia-tbody tr');
+  var graves=[];
+  var criticos=['Látex (caucho natural)','Propofol / excipientes (huevo, soya)','Antibióticos Betalactámicos/Penicilina','Contraste iodado','Relajantes musculares (rocuronio, succinilcolina)','Gelatinas / coloides','Clorhexidina','Opioides / Morfina'];
+  rows.forEach(function(tr){
+    var sels=tr.querySelectorAll('select');
+    var tipo=sels[0]?sels[0].value:'';
+    var sev=sels[1]?sels[1].value:'';
+    if(tipo&&sev==='grave')graves.push(tipo);
+    else if(tipo&&criticos.indexOf(tipo)!==-1&&sev&&sev!=='leve'&&graves.indexOf(tipo)===-1)graves.push(tipo+' ⚠');
+  });
+  var div=document.getElementById('alergias-banner-result');
+  if(graves.length>0){div.innerHTML='<div class="result-box danger"><div class="rb-title">🚨 ALERGIAS DE RELEVANCIA ANESTÉSICA CRÍTICA</div><div class="rb-text">'+graves.map(function(g){return '• '+g;}).join('<br>')+'<br><strong>Acción:</strong> Notificar al equipo. Preparar protocolo de anafilaxia (adrenalina, corticoides IV, antihistamínicos).</div></div>';}
+  else div.innerHTML='';
+}
+
+function agregarFilaAlergia(){
+  var tbody=document.getElementById('alergia-tbody');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td data-label="Categoría"><select onchange="actualizarAlergiaBanner()"><option value="">—</option><optgroup label="Medicamentos"><option value="Antibióticos Betalactámicos/Penicilina">Betalactámicos/Penicilina</option><option value="Antibióticos otros">Antibióticos otros</option><option value="AINEs / Aspirina">AINEs/Aspirina</option><option value="Opioides / Morfina">Opioides/Morfina</option><option value="Relajantes musculares (rocuronio, succinilcolina)">Relajantes musculares</option><option value="Anestésicos locales">Anestésicos locales</option><option value="Propofol / excipientes (huevo, soya)">Propofol/excipientes</option><option value="Sulfamidas">Sulfamidas</option><option value="Heparina">Heparina</option><option value="Otros medicamentos">Otros medicamentos</option></optgroup><optgroup label="Sustancias anestésicas"><option value="Látex (caucho natural)">Látex</option><option value="Contraste iodado">Contraste iodado</option><option value="Gelatinas / coloides">Gelatinas/coloides</option><option value="Clorhexidina">Clorhexidina</option></optgroup><optgroup label="Alimentos"><option value="Huevo">Huevo</option><option value="Soya / Lecitina de soja">Soya/Lecitina</option><option value="Mariscos">Mariscos</option><option value="Frutas tropicales (cross-reactividad látex)">Frutas tropicales</option><option value="Nueces / frutos secos">Nueces</option><option value="Otros alimentos">Otros alimentos</option></optgroup><optgroup label="Otras"><option value="Polen / rinitis">Polen/rinitis</option><option value="Picadura de insectos">Picadura insectos</option><option value="Metales">Metales</option><option value="Adhesivos / apósitos">Adhesivos</option><option value="Otro">Otro</option></optgroup></select></td>'
+  +'<td data-label="Sustancia específica"><input type="text" placeholder="Sustancia..."></td>'
+  +'<td data-label="Reacción observada"><select><option value="">—</option><option>Urticaria/Prurito</option><option>Angioedema</option><option>Eritema/Exantema</option><option>Broncoespasmo/Disnea</option><option>Hipotensión/Shock anafiláctico</option><option>Náuseas/Vómitos</option><option>Rinitis</option><option>Reacción local</option><option>Stevens-Johnson/NET</option><option>Otra</option></select></td>'
+  +'<td data-label="Severidad"><select onchange="actualizarAlergiaBanner()"><option value="">—</option><option value="leve">Leve</option><option value="moderada">Moderada</option><option value="grave">Grave/Anafilaxia</option></select></td>'
+  +'<td data-label="Documentada"><select><option value="">—</option><option>Sí</option><option>No/Referida</option></select></td>'
+  +'<td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>';
+  tbody.appendChild(tr);
+}
+
+function agregarFilaQuirurgico(){
+  var tbody=document.getElementById('antec-quirurgico-tbody');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="2015"></td><td><input type="text" placeholder="Colecistectomía..."></td><td><select><option value="">—</option><option>General (AGE)</option><option>Raquídea</option><option>Epidural</option><option>Regional periférica</option><option>Sedación/MAC</option><option>Local</option><option>Desconocida</option></select></td><td><input type="text" placeholder="H. Privado"></td><td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>';
+  tbody.appendChild(tr);
+}
+
+function agregarFilaComplicacion(){
+  var tbody=document.getElementById('antec-complicaciones-tbody');
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="2018"></td><td><select><option value="">—</option><optgroup label="Vía aérea"><option>Intubación difícil</option><option>Intubación imposible</option><option>Ventilación difícil con máscara</option><option>Laringoespasmo</option><option>Broncoespasmo severo</option><option>Aspiración pulmonar</option></optgroup><optgroup label="Cardiovascular"><option>Paro cardiorrespiratorio</option><option>Arritmia grave</option><option>Hipotensión refractaria</option><option>IAM perioperatorio</option><option>TEP perioperatorio</option></optgroup><optgroup label="Alérgicas"><option>Anafilaxia grave</option><option>Hipertermia maligna</option><option>Síndrome serotoninérgico</option></optgroup><optgroup label="Otras"><option>ACV perioperatorio</option><option>Delirium postoperatorio</option><option>PONV intratable</option><option>Hemorragia mayor</option><option>Reintervención no planificada</option><option>Otra</option></optgroup></select></td><td><input type="text" placeholder="Detalle..."></td><td><select><option value="">—</option><option>Sí</option><option>No</option></select></td><td><select><option value="">—</option><option>Sí, sin secuelas</option><option>Sí, con secuelas</option><option>Parcialmente</option><option>No resuelto</option></select></td><td style="text-align:center;"><button onclick="eliminarFila(this)" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;">×</button></td>';
+  tbody.appendChild(tr);
+}
+
+function eliminarFila(btn){var tr=btn.closest('tr');if(tr)tr.parentNode.removeChild(tr);}
+
+function calcIMC(){var p=parseFloat(document.getElementById('p_peso').value),t=parseFloat(document.getElementById('p_talla').value)/100;if(p>0&&t>0){var imc=(p/(t*t)).toFixed(1);document.getElementById('p_imc').value=imc+' kg/m²';var c='';if(imc<18.5)c='Peso insuficiente';else if(imc<25)c='Peso normal';else if(imc<27)c='Sobrepeso Grado I';else if(imc<29)c='Sobrepeso Grado II';else if(imc<35)c='Obesidad Tipo I';else if(imc<40)c='Obesidad Tipo II';else if(imc<50)c='Obesidad Tipo III (Mórbida)';else c='Superobesidad';document.getElementById('p_imc_clase').value=c;}}
+
+function selASA(el,val){document.querySelectorAll('#asa-options .option-btn').forEach(function(b){b.classList.remove('selected');});el.classList.add('selected');state.asa=val;calcABCD();}
+function selGrado(el,val){document.querySelectorAll('#grado-options .option-btn').forEach(function(b){b.classList.remove('selected');});el.classList.add('selected');state.grado=val;calcABCD();}
+function selCFS(el,val){document.querySelectorAll('#cfs-options .option-btn').forEach(function(b){b.classList.remove('selected');});el.classList.add('selected');state.cfs=val;var m='';if(val<=2)m='<div class="result-box success"><div class="rb-title">CFS '+val+' — Sin fragilidad</div><div class="rb-text">Sin fragilidad significativa.</div></div>';else if(val<=4)m='<div class="result-box info"><div class="rb-title">CFS '+val+' — Pre-fragilidad / Vulnerable</div><div class="rb-text">Evaluar capacidad funcional (DASI). Considerar prehabilitación.</div></div>';else if(val<=6)m='<div class="result-box warn"><div class="rb-title">CFS '+val+' — Fragilidad leve a moderada</div><div class="rb-text">Riesgo aumentado de complicaciones, delirium y reinternación. Prehabilitación multimodal, evaluación geriátrica.</div></div>';else m='<div class="result-box danger"><div class="rb-title">CFS '+val+' — Fragilidad grave / Terminal</div><div class="rb-text">Riesgo muy elevado. Discusión multidisciplinaria obligatoria. Evaluación geriátrica y cuidados paliativos.</div></div>';document.getElementById('cfs-result').innerHTML=m;calcABCD();}
+
+function calcABCD(){if(!state.asa||!state.grado)return;var a=parseInt(state.asa),g=parseInt(state.grado),tipo='',desc='',cls='',rec='';if(a<=2&&g===1){tipo='A';desc='Riesgo bajo';cls='chip-a';rec='Cirugía realizable en 1° y 2° nivel. Alta probabilidad de resolución ambulatoria.';}else if(a<=2&&g===2){tipo='B';desc='Riesgo moderado';cls='chip-b';rec='Realizable en 1° y 2° nivel. Monitoreo estándar.';}else if((a<=2&&g>=3)||(a>=3&&a<=4&&g<=2)){tipo='C';desc='Riesgo alto';cls='chip-c';rec='REQUIERE institución de 3er nivel. Programa ERAS. Probable UCI postoperatoria.';}else{tipo='D';desc='Riesgo muy alto';cls='chip-d';rec='REQUIERE 3er nivel con recursos críticos completos. Discusión multidisciplinaria obligatoria.';}state.abcd=tipo;var note='';if(state.cfs&&state.cfs>=5&&tipo==='A')note='<div class="alert alert-warn" style="margin-top:8px;">⚠ Fragilidad CFS ≥5: considerar escalar a B y planificar prehabilitación.</div>';else if(state.cfs&&state.cfs>=6&&(tipo==='B'||tipo==='C'))note='<div class="alert alert-danger" style="margin-top:8px;">⚠ Fragilidad grave (CFS ≥6). Evaluación geriátrica obligatoria.</div>';var html='<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="font-size:48px;font-weight:bold;color:var(--accent);font-family:var(--font);">'+tipo+'</div><div><span class="score-chip '+cls+'">'+tipo+' — '+desc+'</span><p style="font-size:12px;color:var(--text2);margin-top:6px;">ASA '+a+' + Grado '+g+(state.cfs?' + CFS '+state.cfs:'')+'</p></div></div><div class="result-box '+(tipo==='A'?'success':tipo==='B'?'info':tipo==='C'?'warn':'danger')+'"><div class="rb-text">'+rec+'</div></div>'+note;document.getElementById('abcd-result').innerHTML=html;document.getElementById('abcd-result-card').style.display='block';}
+
+function evalVitals(){var tas=parseFloat(document.getElementById('sv_tas').value),tad=parseFloat(document.getElementById('sv_tad').value),fc=parseFloat(document.getElementById('sv_fc').value),fr=parseFloat(document.getElementById('sv_fr').value),temp=parseFloat(document.getElementById('sv_temp').value),sat=parseFloat(document.getElementById('sv_sat').value),alerts=[];function setFlag(id,cls,txt){var el=document.getElementById(id);el.style.display=txt?'inline':'none';if(txt){el.className='vital-flag '+cls;el.textContent=txt;}}if(!isNaN(tas)){if(tas>=200){setFlag('flag_ta','danger','Crisis HTA');alerts.push('<strong>TAS ≥200:</strong> Crisis hipertensiva. Diferir cirugía electiva.');}else if(tas>=180){setFlag('flag_ta','warn','HTA Grado 3');}else if(tas<90){setFlag('flag_ta','danger','Hipotensión');alerts.push('<strong>TAS &lt;90:</strong> Hipotensión.');}else setFlag('flag_ta','normal','Normal');}else setFlag('flag_ta','','');if(!isNaN(fc)){if(fc>100){setFlag('flag_fc','warn','Taquicardia');alerts.push('<strong>FC &gt;100:</strong> Taquicardia.');}else if(fc<50){setFlag('flag_fc','warn','Bradicardia');alerts.push('<strong>FC &lt;50:</strong> Bradicardia.');}else setFlag('flag_fc','normal','Normal');}else setFlag('flag_fc','','');if(!isNaN(fr)){if(fr>20){setFlag('flag_fr','warn','Taquipnea');}else if(fr<10){setFlag('flag_fr','danger','Bradipnea');}else setFlag('flag_fr','normal','Normal');}else setFlag('flag_fr','','');if(!isNaN(temp)){if(temp>=38.5){setFlag('flag_temp','danger','Fiebre');alerts.push('<strong>Temperatura ≥38.5°C:</strong> Diferir electiva.');}else if(temp>=37.5)setFlag('flag_temp','warn','Subfebril');else if(temp<35)setFlag('flag_temp','warn','Hipotermia');else setFlag('flag_temp','normal','Normal');}else setFlag('flag_temp','','');if(!isNaN(sat)){if(sat<90){setFlag('flag_sat','danger','Hipoxemia');alerts.push('<strong>SatO2 &lt;90%:</strong> Hipoxemia severa.');}else if(sat<94){setFlag('flag_sat','warn','Sat reducida');}else setFlag('flag_sat','normal','Normal');}else setFlag('flag_sat','','');var d=document.getElementById('vitals-alerts');d.innerHTML=alerts.length?'<div class="result-box danger"><div class="rb-title">⚠ Hallazgos anormales</div><div class="rb-text">'+alerts.map(function(a){return '• '+a;}).join('<br>')+'</div></div>':'';}
+
+function selVAD(key,label,type,el){el.parentElement.querySelectorAll('.vad-btn').forEach(function(b){b.classList.remove('sel-ok','sel-alert');});el.classList.add(type==='alert'?'sel-alert':'sel-ok');state.vad[key]={label:label,type:type};evalVAD();}
+function evalVAD(){var ai=Object.values(state.vad).filter(function(v){return v.type==='alert';}).map(function(v){return v.label;}),n=ai.length,html='';if(n===0)html='<div class="result-box success"><div class="rb-title">✅ Sin predictores de VAD</div><div class="rb-text">No se identificaron factores de riesgo para intubación dificultosa.</div></div>';else if(n===1)html='<div class="result-box warn"><div class="rb-title">⚠ 1 predictor de VAD</div><div class="vad-criteria">'+ai.map(function(i){return '<span class="vad-tag">'+i+'</span>';}).join('')+'</div><div class="rb-text" style="margin-top:8px;">Mantener alerta. Preparar equipos alternativos.</div></div>';else html='<div class="vad-alert"><div class="vad-alert-title">🚨 VAD ANTICIPADA — '+n+' predictores</div><div class="vad-criteria">'+ai.map(function(i){return '<span class="vad-tag">'+i+'</span>';}).join('')+'</div><div style="margin-top:12px;font-size:12px;color:var(--danger);">• Informar al cirujano y enfermería<br>• Preparar carro VAD (videolaringoscopio, ML rescate, fibroscopio disponible)<br>• Considerar intubación vigil si ≥3 predictores<br>• Planificar Plan A, B y C<br>• Documentar y alertar al paciente</div></div>';document.getElementById('vad-result').innerHTML=html;}
+
+function calcBEARD(){var b=document.getElementById('beard_b').checked?1:0,e=document.getElementById('beard_e').checked?1:0,a=document.getElementById('beard_a').checked?1:0,r=document.getElementById('beard_r').checked?1:0,d=document.getElementById('beard_d').checked?1:0,total=b+e+a+r+d;state.beard=total;var items=[];if(b)items.push('Barba (B)');if(e)items.push('Desdentado (E)');if(a)items.push('Edad >55 (A)');if(r)items.push('Apertura restringida (R)');if(d)items.push('Antecedentes/SAOS (D)');var tags=items.map(function(i){return '<span class="vad-tag" style="background:var(--warn-bg);border-color:#c4820a;color:var(--warn);">'+i+'</span>';}).join('');var html='';if(total===0)html='<div class="result-box success"><div class="rb-title">BEARD: 0/5 — Bajo riesgo de VMD</div><div class="rb-text">Sin predictores de dificultad en ventilación con máscara. Inducción estándar.</div></div>';else if(total===1)html='<div class="result-box warn"><div class="rb-title">BEARD: 1/5 — Riesgo moderado de VMD</div><div class="vad-criteria" style="margin:6px 0;">'+tags+'</div><div class="rb-text">Preparar cánula Guedel. Optimizar posicionamiento (rampa/HELP). Máscara laríngea disponible.</div></div>';else if(total<=2)html='<div class="beard-alert"><div class="beard-alert-title">🚨 BEARD: '+total+'/5 — ALTO RIESGO de VMD</div><div class="vad-criteria" style="margin:6px 0;">'+items.map(function(i){return '<span class="vad-tag">'+i+'</span>';}).join('')+'</div><div style="font-size:12px;color:var(--danger);margin-top:8px;">• Máscara laríngea supraglótica de 2° generación disponible<br>• Videolaringoscopio en sala<br>• Considerar inducción en ventilación espontánea<br>• Notificar al equipo y documentar</div></div>';else html='<div class="beard-alert"><div class="beard-alert-title">🆘 BEARD: '+total+'/5 — MUY ALTO RIESGO — CICO PREVISIBLE</div><div class="vad-criteria" style="margin:6px 0;">'+items.map(function(i){return '<span class="vad-tag">'+i+'</span>';}).join('')+'</div><div style="font-size:12px;color:var(--danger);margin-top:8px;"><strong>ACCIONES OBLIGATORIAS:</strong><br>• Intubación vigil bajo fibroanestesia tópica<br>• Cirujano disponible para cricotirotomía de emergencia<br>• Kit CICO (Can\'t Intubate, Can\'t Oxygenate) verificado<br>• Discusión multidisciplinaria preoperatoria<br>• Consentimiento informado específico</div></div>';document.getElementById('beard-result').innerHTML=html;}
+
+function calcSTOPBANG(){var pts=0;for(var i=1;i<=8;i++)if(document.getElementById('sb'+i).checked)pts++;state.stopbang=pts;var cls='',nivel='',txt='';if(pts<=2){cls='success';nivel='Bajo riesgo SAOS';txt='Puntaje '+pts+'/8.';}else if(pts<=4){cls='warn';nivel='Riesgo intermedio SAOS';txt='Puntaje '+pts+'/8. Considerar polisomnografía y monitoreo postoperatorio ampliado.';}else{cls='danger';nivel='Alto riesgo SAOS';txt='Puntaje '+pts+'/8. Solicitar polisomnografía. Si usa CPAP/BiPAP: traer el día de cirugía.';}document.getElementById('stopbang-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">STOP-BANG: '+pts+'/8 — '+nivel+'</div><div class="rb-text">'+txt+'</div></div>';}
+
+function initCardio(){state.urgencia=document.getElementById('p_urgencia').value;var u=state.urgencia,msg='';if(u==='emergencia'||u==='urgente')msg='<div class="result-box danger"><div class="rb-title">Urgente/Emergencia</div><div class="rb-text">Proceder. Sin evaluación cardíaca adicional preoperatoria.</div></div>';else if(u==='tiempo_sensible')msg='<div class="result-box warn"><div class="rb-title">Tiempo-sensible</div><div class="rb-text">Evaluar y optimizar comorbilidades en el tiempo disponible.</div></div>';else msg='<div class="result-box info"><div class="rb-title">Electiva</div><div class="rb-text">Tiempo suficiente para evaluación y optimización completa.</div></div>';document.getElementById('esc1-result').innerHTML=msg;evalCardio();}
+
+function evalCardio(){var checks=document.querySelectorAll('[name=ca]:checked');state.condicionActiva=checks.length>0;var msg='';if(state.condicionActiva){var conds=[];checks.forEach(function(c){var m={sca:'SCA inestable',ic:'IC descompensada',arritmia:'Arritmia significativa',valvula:'Valvulopatía grave'};conds.push(m[c.value]);});msg='<div class="result-box danger"><div class="rb-title">⚠ Condición cardíaca activa — Posponer cirugía electiva</div><div class="rb-text">'+conds.join(', ')+'. Interconsulta urgente a Cardiología.</div></div>';}else msg='<div class="result-box success"><div class="rb-title">Sin condición cardíaca activa</div><div class="rb-text">Continuar evaluación.</div></div>';document.getElementById('esc2-result').innerHTML=msg;var g=parseInt(state.grado)||0,e3='';if(g===1)e3='<div class="result-box success"><div class="rb-title">Grado 1 — Bajo riesgo (&lt;1% MACE)</div><div class="rb-text">Sin estudios cardíacos adicionales.</div></div>';else if(g>=2)e3='<div class="result-box warn"><div class="rb-title">Grado '+g+' — Riesgo '+(g===2?'intermedio':'alto')+' (&gt;1% MACE)</div><div class="rb-text">Continuar escalones 4 y 5.</div></div>';else e3='<div class="result-box info"><div class="rb-text">Complete el grado quirúrgico.</div></div>';document.getElementById('esc3-result').innerHTML=e3;}
+
+function calcDASI(){var v=[2.75,1.75,2.75,5.5,8,2.7,3.5,8,4.5,5.25,6,7.5],t=0;for(var i=1;i<=12;i++)if(document.getElementById('d'+i).checked)t+=v[i-1];state.dasiScore=t;var vo2=0.43*t+9.6,mets=vo2/3.5;state.mets=mets;var cls=mets>=4?'success':t>0?'warn':'info',txt=mets>=4?'Capacidad funcional ADECUADA (≥4 METs).':t>0?'Capacidad funcional REDUCIDA (&lt;4 METs). Prehabilitación indicada.':'Complete el DASI.';document.getElementById('dasi-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">DASI: '+t.toFixed(2)+' | VO2max: '+vo2.toFixed(1)+' ml/kg/min | METs: '+mets.toFixed(1)+'</div><div class="rb-text">'+txt+'</div></div>';calcRCRI();}
+
+function calcRCRI(){var pts=0;for(var i=1;i<=6;i++)if(document.getElementById('rcri'+i).checked)pts++;state.rcri=pts;var cls=pts<=1?'success':pts===2?'warn':'danger',clase=['I (0.4%)','II (0.9%)','III (6.6%)','IV (11%)'][Math.min(pts,3)],txt=pts<2?'No requieren estudios adicionales.':pts===2?'Considerar pruebas no invasivas.':'ALTO RIESGO. Interconsulta Cardiología.';document.getElementById('rcri-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">RCRI: '+pts+' pts — Clase '+clase+'</div><div class="rb-text">'+txt+'</div></div>';}
+
+function evalStent(){var tipo=document.getElementById('stent_tipo').value,tiempo=document.getElementById('stent_tiempo').value;if(!tipo||!tiempo){document.getElementById('stent-result').innerHTML='';return;}var cls='',txt='';if(tipo==='balon'){if(tiempo==='lt14'){cls='danger';txt='Diferir. Riesgo elevado &lt;14 días.';}else{cls='success';txt='Puede proceder con AAS.';}}else if(tipo==='convencional'){if(tiempo==='lt14'||tiempo==='14_30'){cls='danger';txt='Diferir. Stent convencional requiere 4-6 semanas.';}else{cls='success';txt='&gt;30 días: puede proceder con AAS.';}}else if(tipo==='medicado'){if(tiempo!=='gt365'){cls='danger';txt='DIFERIR. Stent medicado requiere 1 AÑO de antiagregación dual.';}else{cls='warn';txt='&gt;1 año: considerar con AAS. Valorar con Cardiología.';}}document.getElementById('stent-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-text">'+txt+'</div></div>';}
+
+function evalResp(){var p2=parseFloat(document.getElementById('pao2').value),pco2=parseFloat(document.getElementById('paco2').value),s=parseFloat(document.getElementById('sato2').value),m=[];if(!isNaN(pco2)&&pco2>45)m.push('<span style="color:var(--warn)">PaCO2 &gt;45: hipercapnia.</span>');if(!isNaN(s)&&s<90)m.push('<span style="color:var(--danger)">SatO2 &lt;90%: alto riesgo.</span>');if(!isNaN(p2)){if(p2<60)m.push('<span style="color:var(--danger)">PaO2 &lt;60: insuficiencia respiratoria.</span>');else if(p2<80)m.push('<span style="color:var(--warn)">PaO2 60-80: hipoxemia leve-moderada.</span>');}document.getElementById('gaso-result').innerHTML=m.length?'<div class="result-box warn"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';}
+
+function evalEspiro(){var fa=parseFloat(document.getElementById('fev1_abs').value),fp=parseFloat(document.getElementById('fev1_pct').value),dl=parseFloat(document.getElementById('dlco_pct').value),m=[];if(!isNaN(fp)){if(fp>=80)m.push('<span style="color:var(--success)">FEV1 ≥80%: sin limitación.</span>');else if(fp>=50)m.push('<span style="color:var(--warn)">FEV1 50-80%: limitación moderada. Calcular FEV1 ppo.</span>');else m.push('<span style="color:var(--danger)">FEV1 &lt;50%: limitación grave.</span>');}if(!isNaN(fa)){if(fa>2)m.push('FEV1 >2L: tolera neumonectomía.');else if(fa>1.5)m.push('FEV1 1.5-2L: tolera lobectomía.');else m.push('<span style="color:var(--danger)">FEV1 &lt;1.5L: alto riesgo.</span>');}if(!isNaN(dl)){if(dl<60)m.push('<span style="color:var(--danger)">DLCO &lt;60%: mayor mortalidad.</span>');else if(dl<80)m.push('<span style="color:var(--warn)">DLCO &lt;80%: riesgo duplicado.</span>');else m.push('<span style="color:var(--success)">DLCO ≥80%: adecuado.</span>');}document.getElementById('espiro-result').innerHTML=m.length?'<div class="result-box info"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';}
+
+function evalPPO(){var fp=parseFloat(document.getElementById('fev1ppo').value),dp=parseFloat(document.getElementById('dlcoppo').value),m=[];if(!isNaN(fp)){if(fp>60)m.push('<span style="color:var(--success)">FEV1 ppo &gt;60%: bajo riesgo.</span>');else if(fp>=30)m.push('<span style="color:var(--warn)">FEV1 ppo 30-60%: riesgo intermedio.</span>');else m.push('<span style="color:var(--danger)">FEV1 ppo &lt;30%: muy alto riesgo.</span>');}if(!isNaN(dp)){if(dp<40)m.push('<span style="color:var(--danger)">DLCO ppo &lt;40%: mortalidad 30-50%.</span>');else if(dp>=60)m.push('<span style="color:var(--success)">DLCO ppo ≥60%: bajo riesgo.</span>');else m.push('<span style="color:var(--warn)">DLCO ppo 40-60%: intermedio.</span>');}document.getElementById('ppo-result').innerHTML=m.length?'<div class="result-box info"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';}
+
+function evalVO2(){var v=parseFloat(document.getElementById('vo2max').value),s=document.getElementById('sct').value,t=parseFloat(document.getElementById('t6min').value),m=[];if(!isNaN(v)){if(v>=20)m.push('<span style="color:var(--success)">VO2max ≥20: BAJO RIESGO.</span>');else if(v>10)m.push('<span style="color:var(--warn)">VO2max 10-20: INTERMEDIO.</span>');else m.push('<span style="color:var(--danger)">VO2max ≤10: ALTO RIESGO.</span>');}if(s==='5')m.push('<span style="color:var(--success)">SCT ≥5 pisos: BAJO RIESGO.</span>');else if(s==='3')m.push('<span style="color:var(--warn)">SCT 3-4 pisos: moderado.</span>');else if(s==='1')m.push('<span style="color:var(--warn)">SCT 1-2 pisos: reducido.</span>');else if(s==='0')m.push('<span style="color:var(--danger)">SCT &lt;1 piso: ALTO RIESGO.</span>');if(!isNaN(t)){if(t>400)m.push('<span style="color:var(--success)">Test 6 min &gt;400m: BAJO RIESGO.</span>');else m.push('<span style="color:var(--warn)">Test 6 min ≤400m: considerar CPET.</span>');}document.getElementById('vo2-result').innerHTML=m.length?'<div class="result-box info"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';}
+
+function evalAnemia(){var hb=parseFloat(document.getElementById('lab_hb').value),s=document.getElementById('p_sexo').value,li=(s==='Femenino')?12:13;if(isNaN(hb)){document.getElementById('anemia-result').innerHTML='';return;}var cls='',g='',t='';if(hb>=li){cls='success';g='Normal';t='Hb dentro de rango normal.';}else if(hb>=10){cls='warn';g='Anemia Grado I';t='Estudiar metabolismo del hierro. Objetivo Hb ≥'+li+' g/dl al menos 28 días antes.';}else if(hb>=8){cls='danger';g='Anemia Grado II';t='Evaluación hematológica. Hierro EV + EPO.';}else{cls='danger';g='Anemia Grado III-IV';t='Contraindicación relativa a cirugía electiva. Hierro EV + EPO + hematólogo.';}document.getElementById('anemia-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">'+g+' — Hb: '+hb+' g/dl</div><div class="rb-text">'+t+'</div></div>';evalHierroEV();}
+
+function evalVCM(){var v=parseFloat(document.getElementById('lab_vcm').value);if(isNaN(v)){document.getElementById('vcm-result').innerHTML='';return;}var t='',c='';if(v<80){t='Microcítica';c='warn';}else if(v<=100){t='Normocítica';c='info';}else{t='Macrocítica';c='warn';}var o=v<80?'Deficit hierro, anemia crónica, talasemia.':v<=100?'Deficit hierro, hemolítica, aplasia.':'Deficit B12/folato, mielodisplasia.';document.getElementById('vcm-result').innerHTML='<div class="result-box '+c+'"><div class="rb-title">Anemia '+t+' (VCM: '+v+' fL)</div><div class="rb-text">'+o+'</div></div>';}
+
+function evalHierro(){var f=parseFloat(document.getElementById('lab_ferritina').value),i=parseFloat(document.getElementById('lab_ist').value),p=parseFloat(document.getElementById('lab_pcr').value),m=[];if(!isNaN(f)){if(f<30)m.push('<span style="color:var(--danger)">Ferritina &lt;30: déficit absoluto.</span>');else if(f<100)m.push('<span style="color:var(--warn)">Ferritina 30-100: posible déficit funcional.</span>');else if(f>500)m.push('<span style="color:var(--danger)">Ferritina &gt;500: sospechar sobrecarga.</span>');else m.push('<span style="color:var(--success)">Ferritina normal.</span>');}if(!isNaN(i)){if(i<20)m.push('<span style="color:var(--warn)">IST &lt;20%: déficit funcional o absoluto.</span>');else if(i>50)m.push('<span style="color:var(--warn)">IST &gt;50%: sobrecarga de hierro.</span>');else m.push('<span style="color:var(--success)">IST normal.</span>');}if(!isNaN(p)&&p>5)m.push('<span style="color:var(--warn)">PCR &gt;5: inflamación activa.</span>');document.getElementById('hierro-result').innerHTML=m.length?'<div class="result-box info"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';evalHierroEV();}
+
+function evalHierroEV(){var hb=parseFloat(document.getElementById('lab_hb').value),f=parseFloat(document.getElementById('lab_ferritina').value),i=parseFloat(document.getElementById('lab_ist').value),p=parseFloat(document.getElementById('lab_pcr').value),s=document.getElementById('p_sexo').value,li=(s==='Femenino')?12:13,ind=[];if(!isNaN(hb)&&hb<li&&!isNaN(f)&&f<30)ind.push('Déficit absoluto con anemia');if(!isNaN(i)&&i<15)ind.push('IST &lt;15%');if(!isNaN(f)&&!isNaN(p)&&f<100&&p>5)ind.push('Déficit funcional por inflamación');if(ind.length>0){var peso=parseFloat(document.getElementById('p_peso').value)||70;if(!isNaN(hb)){var dosis=Math.round(peso*(li-hb)*10*0.24+500);document.getElementById('hierro-ev-result').innerHTML='<div class="result-box purple"><div class="rb-title">💉 Considerar Hierro Endovenoso</div><div class="rb-text">Indicaciones: '+ind.join(', ')+'.<br><strong>Dosis estimada:</strong> ≈ '+dosis+' mg de hierro elemental.</div></div>';}}else document.getElementById('hierro-ev-result').innerHTML='';}
+
+function evalGluc(){var g=parseFloat(document.getElementById('lab_gluc').value),h=parseFloat(document.getElementById('lab_hba1c').value),m=[];if(!isNaN(g)&&g>100)m.push('Glucemia &gt;100 mg/dl: solicitar HbA1c.');if(!isNaN(h)){if(h>9)m.push('<span style="color:var(--danger)">HbA1c &gt;9%: diferir cirugía electiva.</span>');else if(h>7)m.push('<span style="color:var(--warn)">HbA1c 7-9%: control subóptimo.</span>');else m.push('<span style="color:var(--success)">HbA1c ≤7%: buen control.</span>');}document.getElementById('gluc-result').innerHTML=m.length?'<div class="result-box info"><div class="rb-text">'+m.join('<br>')+'</div></div>':'';}
+
+function evalFEVI(){var f=parseFloat(document.getElementById('est_fevi').value);if(isNaN(f)){document.getElementById('fevi-result').innerHTML='';return;}var cls='',t='';if(f>=50){cls='success';t='FEyVI conservada: función sistólica normal.';}else if(f>=40){cls='warn';t='FEyVI levemente reducida (40-50%): ASA 3.';}else if(f>=30){cls='danger';t='FEyVI reducida (30-40%): ASA 4.';}else{cls='danger';t='FEyVI &lt;30%: contraindica cirugía electiva moderada-alta.';}document.getElementById('fevi-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">FEyVI: '+f+'%</div><div class="rb-text">'+t+'</div></div>';}
+
+function evalPONS(){var n=document.querySelectorAll('[id^="pons"]:checked').length,m=n>0?'<div class="result-box danger"><div class="rb-title">⚠ PONS POSITIVO — Riesgo Nutricional ('+n+'/4)</div><div class="rb-text">Derivar a Nutricionista. Iniciar suplementación ≥7 días antes (ideal 4 semanas).</div></div>':'<div class="result-box success"><div class="rb-title">PONS negativo</div><div class="rb-text">Sin riesgo nutricional. Objetivo proteico ≥1.2 g/kg/día.</div></div>';document.getElementById('pons-result').innerHTML=m;}
+
+function calcChildPugh(){var b=parseInt(document.getElementById('cp_bili').value)||0,a=parseInt(document.getElementById('cp_alb').value)||0,t=parseInt(document.getElementById('cp_tp').value)||0,s=parseInt(document.getElementById('cp_ascitis').value)||0,e=parseInt(document.getElementById('cp_encef').value)||0,tot=b+a+t+s+e;if(tot===0){document.getElementById('childpugh-result').innerHTML='';return;}var cl='',cls='',tx='',mo='';if(tot<=6){cl='A';cls='success';mo='Mortalidad ~10%.';tx='Hepatopatía compensada.';}else if(tot<=9){cl='B';cls='warn';mo='Mortalidad ~30%.';tx='Interconsulta Hepatología.';}else{cl='C';cls='danger';mo='Mortalidad &gt;80%.';tx='Contraindicación relativa. Discusión multidisciplinaria.';}document.getElementById('childpugh-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">Child-Pugh Clase '+cl+' — '+tot+' pts</div><div class="rb-text"><strong>'+mo+'</strong><br>'+tx+'</div></div>';}
+
+function calcCAPRINI(){var pts=0;document.querySelectorAll('.cap1:checked').forEach(function(){pts+=1;});document.querySelectorAll('.cap2:checked').forEach(function(){pts+=2;});document.querySelectorAll('.cap3:checked').forEach(function(){pts+=3;});document.querySelectorAll('.cap5:checked').forEach(function(){pts+=5;});state.caprini=pts;var cls='',r='',rec='';if(pts===0){cls='success';r='Muy bajo';rec='Sin HBPM. Deambulación precoz.';}else if(pts<=2){cls='info';r='Bajo';rec='Medias de compresión o CNI.';}else if(pts<=4){cls='warn';r='Moderado';rec='HBPM profiláctica (enoxaparina 40 mg/día SC).';}else{cls='danger';r='Alto';rec='HBPM + medias + CNI intraoperatorio. Prolongar 28 días en oncología.';}document.getElementById('caprini-result').innerHTML='<div class="result-box '+cls+'"><div class="rb-title">CAPRINI: '+pts+' pts — '+r+'</div><div class="rb-text">'+rec+'</div></div>';}
+
+function evalPuente(){var n=document.querySelectorAll('[id^="puente"]:checked').length;document.getElementById('puente-result').innerHTML=n===0?'<div class="result-box success"><div class="rb-title">Sin indicación de puente con HBPM</div><div class="rb-text">Suspender anticoagulante según tiempos y reiniciar en postoperatorio.</div></div>':'<div class="result-box danger"><div class="rb-title">⚠ INDICACIÓN DE PUENTE CON HBPM</div><div class="rb-text">'+n+' factor/es de alto riesgo trombótico.<br>• Warfarina: suspender 5 días antes<br>• Iniciar enoxaparina terapéutica cuando RIN &lt;2<br>• Última dosis HBPM: 24 hs antes<br>• Reiniciar 24-72 hs postop<br><strong>Interconsulta hematología/cardiología.</strong></div></div>';}
+
+function addMedRow(){var r=document.createElement('div');r.style.cssText='display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;align-items:end;';r.innerHTML='<div class="field"><input type="text" placeholder="Medicamento"></div><div class="field"><input type="text" placeholder="Dosis"></div><div class="field"><input type="text" placeholder="Indicación"></div><div class="field"><select><option value="">—</option><option>Continuar</option><option>Suspender</option><option>Ajustar dosis</option><option>Consultar</option></select></div>';document.getElementById('med-list').appendChild(r);}
+
+function getAlergias(){if(state.ningunoAlergias)return'NARSA — Sin alergias conocidas.';var rows=document.querySelectorAll('#alergia-tbody tr'),items=[];rows.forEach(function(tr){var sels=tr.querySelectorAll('select'),inps=tr.querySelectorAll('input');var tipo=sels[0]?sels[0].value.trim():'',sust=inps[0]?inps[0].value.trim():'',reac=sels[1]?sels[1].value.trim():'',sev=sels[2]?sels[2].value.trim():'';if(tipo||sust){var l=(tipo?tipo:'')+(sust?' ('+sust+')':'');if(reac)l+=' → '+reac;if(sev)l+=' ['+sev.toUpperCase()+']';items.push(l);}});return items.length>0?items.join('<br>'):'Sin alergias registradas.';}
+function getAntecedentesQuirurgicos(){if(state.ningunoCirugias)return'Sin antecedentes quirúrgicos previos.';var rows=document.querySelectorAll('#antec-quirurgico-tbody tr'),items=[];rows.forEach(function(tr){var inp=tr.querySelectorAll('input, select');var anio=inp[0]?inp[0].value.trim():'',proc=inp[1]?inp[1].value.trim():'',anest=inp[2]?inp[2].value.trim():'',inst=inp[3]?inp[3].value.trim():'';if(proc){var l=(anio?anio+': ':'')+proc;if(anest)l+=' ['+anest+']';if(inst)l+=' — '+inst;items.push(l);}});return items.length>0?items.join('<br>'):'Sin antecedentes registrados.';}
+function getAntecedentesComplicaciones(){if(state.ningunoComplics)return'Sin complicaciones previas.';var rows=document.querySelectorAll('#antec-complicaciones-tbody tr'),items=[];rows.forEach(function(tr){var inp=tr.querySelectorAll('input, select');var anio=inp[0]?inp[0].value.trim():'',tipo=inp[1]?inp[1].value.trim():'',desc=inp[2]?inp[2].value.trim():'',uci=inp[3]?inp[3].value.trim():'',res=inp[4]?inp[4].value.trim():'';if(tipo){var l=(anio?anio+': ':'')+tipo;if(desc)l+=' — '+desc;if(uci)l+=' | UCI: '+uci;if(res)l+=' | '+res;items.push(l);}});return items.length>0?items.join('<br>'):'Sin complicaciones registradas.';}
+
+function generarInforme(){
+  var nombre=document.getElementById('p_nombre').value||'Sin identificar';
+  var hc=document.getElementById('p_hc').value||'—';
+  var edad=document.getElementById('p_edad').value||'—';
+  var fnac=document.getElementById('p_fnac').value||'';
+  var sexo=document.getElementById('p_sexo').value||'—';
+  var peso=document.getElementById('p_peso').value||'—';
+  var talla=document.getElementById('p_talla').value||'—';
+  var imc=document.getElementById('p_imc').value||'—';
+  var imcCls=document.getElementById('p_imc_clase').value||'—';
+  var os=document.getElementById('p_os').value||'Particular';
+  var afiliado=document.getElementById('p_afiliado').value||'—';
+  var dx=document.getElementById('p_dx').value||'No especificado';
+  var cir=document.getElementById('p_cirugia').value||'No especificada';
+  var esp=document.getElementById('p_especialidad').value||'—';
+  var urg=document.getElementById('p_urgencia').value;
+  var urgMap={electiva:'Electiva',tiempo_sensible:'Tiempo-sensible',urgente:'Urgente',emergencia:'Emergencia'};
+  var medico=document.getElementById('p_medico').value||'—';
+  var fecha=document.getElementById('p_fecha').value||(new Date().toLocaleDateString('es-AR'));
+  var tas=document.getElementById('sv_tas').value||'—',tad=document.getElementById('sv_tad').value||'—';
+  var fc=document.getElementById('sv_fc').value||'—',fr=document.getElementById('sv_fr').value||'—';
+  var temp=document.getElementById('sv_temp').value||'—',sat=document.getElementById('sv_sat').value||'—';
+  var ritmo=document.getElementById('sv_ritmo').value||'—',pulm=document.getElementById('sv_pulm').value||'—';
+  var hb=document.getElementById('lab_hb').value||'—',ferr=document.getElementById('lab_ferritina').value||'—';
+  var ist=document.getElementById('lab_ist').value||'—',gluc=document.getElementById('lab_gluc').value||'—';
+  var hba1c=document.getElementById('lab_hba1c').value||'—',creat=document.getElementById('lab_creat').value||'—';
+  var alb=document.getElementById('lab_alb').value||'—',fevi=document.getElementById('est_fevi').value||'—';
+  var ecg=document.getElementById('est_ecg').value||'No realizado',eco=document.getElementById('est_eco').value||'No realizado';
+  var ergo=document.getElementById('est_ergometria').value||'No realizado',rx=document.getElementById('est_rx').value||'No realizado';
+  var fev1p=document.getElementById('fev1_pct').value||'—',dlco=document.getElementById('dlco_pct').value||'—';
+  var interconsultas=document.getElementById('ph_interconsultas').value||'Sin interconsultas indicadas';
+  var recomendaciones=document.getElementById('ph_otras').value||'';
+  var ejercicio=document.getElementById('ph_ejercicio').value||'Pendiente';
+  var nutricion=document.getElementById('ph_nutricion').value||'Pendiente';
+  var psico=document.getElementById('ph_psico').value||'Sin requerimientos';
+  var tabaco=document.getElementById('ph_tabaco').value;
+  var alcohol=document.getElementById('ph_alcohol').value;
+  var antibiotico=document.getElementById('ph_antibiotico').value||'Según protocolo institucional';
+  var asaVal=state.asa||'—',gradoVal=state.grado||'—',abcdVal=state.abcd||'—',cfsVal=state.cfs||'—';
+  var dasiVal=state.dasiScore?state.dasiScore.toFixed(2):'—',metsVal=state.mets?state.mets.toFixed(1):'—';
+  var rcriVal=state.rcri!==undefined?state.rcri:'—',sbVal=state.stopbang||0,capVal=state.caprini||0,beardVal=state.beard||0;
+  var ponsN=document.querySelectorAll('[id^="pons"]:checked').length;
+  var vadAlerts=Object.values(state.vad).filter(function(v){return v.type==='alert';}).map(function(v){return v.label;});
+  var rcriDesc=['Clase I (0.4%)','Clase II (0.9%)','Clase III (6.6%)','Clase IV (11%)'][Math.min(parseInt(rcriVal)||0,3)];
+  var capRiesgo=capVal===0?'Muy bajo':capVal<=2?'Bajo':capVal<=4?'Moderado':'Alto';
+  var sbRiesgo=sbVal<=2?'Bajo':sbVal<=4?'Intermedio':'Alto';
+  var beardRiesgo=beardVal===0?'Bajo':beardVal===1?'Moderado':beardVal<=2?'Alto':'Muy alto — CICO previsible';
+  var cfsLabel=cfsVal!=='—'?'CFS '+cfsVal+(cfsVal<=2?' (Sin fragilidad)':cfsVal<=4?' (Vulnerable)':cfsVal<=6?' (Frágil)':' (Gravemente frágil)'):'—';
+  var alergias=getAlergias(),antecQx=getAntecedentesQuirurgicos(),antecComp=getAntecedentesComplicaciones();
+  var hayAlergia=!state.ningunoAlergias&&alergias!=='NARSA — Sin alergias conocidas.'&&alergias!=='Sin alergias registradas.';
+  var hayComp=!state.ningunoComplics&&antecComp!=='Sin complicaciones previas.'&&antecComp!=='Sin complicaciones registradas.';
+  var fnacStr=fnac?' — F. nac.: '+fnac:'';
+  var getTabacoDesc=function(v){return{no:'No fumador.',exfumador:'Exfumador >4 semanas.',activo:'Fumador activo — suspender >4 semanas preop.',reciente:'Abstinencia <4 semanas.'}[v]||'—';};
+  var getAlcoholDesc=function(v){return{no:'Sin consumo excesivo.',moderado:'Consumo moderado.',excesivo:'Consumo excesivo — suspender preop.'}[v]||'—';};
+  var getASADesc=function(v){return{1:'Sano',2:'Alteración sistémica leve-moderada',3:'Enfermedad sistémica grave con limitación funcional',4:'Enfermedad que amenaza la vida',5:'Moribundo'}[v]||'—';};
+  var getGradoDesc=function(v){return{1:'Menor / ambulatorio',2:'Mediano / internación breve',3:'Mayor / alta complejidad',4:'Muy relevante / máxima complejidad'}[v]||'—';};
+  var getABCDDesc=function(v){return{A:'Riesgo bajo — 1° y 2° nivel',B:'Riesgo moderado — 1° y 2° nivel',C:'Riesgo alto — 3er nivel',D:'Riesgo muy alto — 3er nivel + UCI'}[v]||'—';};
+  var conclusionCls=abcdVal==='A'?'success':abcdVal==='B'?'info':abcdVal==='C'?'warn':'danger';
+  var conclusionTxt='';
+  if(abcdVal&&abcdVal!=='—'){conclusionTxt='Clasificación de riesgo perioperatorio <strong>'+abcdVal+'</strong> (ASA '+asaVal+', Grado '+gradoVal+(cfsVal!=='—'?' — CFS '+cfsVal:'')+').';if(abcdVal==='A')conclusionTxt+=' Procedimiento de bajo riesgo.';else if(abcdVal==='B')conclusionTxt+=' Evaluación preoperatoria completa indicada.';else if(abcdVal==='C')conclusionTxt+=' <strong>Requiere institución de 3er nivel.</strong> Programa ERAS.';else conclusionTxt+=' <strong>Requiere 3er nivel con UCI disponible.</strong> Discusión multidisciplinaria obligatoria.';if(parseInt(rcriVal)>=2)conclusionTxt+=' RCRI '+rcriVal+' pts: riesgo cardíaco elevado — evaluación cardiológica especializada.';if(parseFloat(metsVal)>0&&parseFloat(metsVal)<4)conclusionTxt+=' Capacidad funcional &lt;4 METs: prehabilitación física intensificada.';if(cfsVal&&cfsVal>=5)conclusionTxt+=' Fragilidad (CFS '+cfsVal+'): considerar en planificación.';if(beardVal>=2)conclusionTxt+=' <strong>BEARD ≥2: alto riesgo VMD — plan de rescate obligatorio.</strong>';}
+
+  var html='<div class="print-header"><div class="print-logo">Consultorio Perioperatorio<br><span style="font-size:14px;font-weight:normal;color:var(--text2)">Hospital Guillermo Rawson</span></div><div class="print-meta">Fecha: '+fecha+'<br>Evaluador: '+medico+'<br>HC: '+hc+'<br>OS: '+os+(afiliado!=='—'?' N°'+afiliado:'')+'</div></div>'
+  +'<hr style="border:none;border-top:2px solid var(--accent-light);margin-bottom:20px;">'
+  +'<h2>Informe de Evaluación Perioperatoria</h2>'
+  +'<h3>1. Identificación</h3>'
+  +'<p><strong>Paciente:</strong> '+nombre+' | <strong>Edad:</strong> '+edad+' años'+fnacStr+' | <strong>Sexo:</strong> '+sexo+'</p>'
+  +'<p><strong>Peso:</strong> '+peso+' kg | <strong>Talla:</strong> '+talla+' cm | <strong>IMC:</strong> '+imc+' ('+imcCls+')</p>'
+  +'<p><strong>Cobertura:</strong> '+os+(afiliado!=='—'?' — N° '+afiliado:'')+'</p>'
+  +'<h3>2. ⚠ Alergias e Hipersensibilidades</h3>'
+  +(hayAlergia?'<div style="background:#fff0f0;border:2px solid var(--danger);border-radius:6px;padding:12px 16px;margin-bottom:8px;font-size:13px;"><strong>🚨 ALERTA DE ALERGIAS:</strong><br>'+alergias+'</div>':'<p style="font-size:13px;">'+alergias+'</p>')
+  +'<h3>3. Diagnóstico y Cirugía Propuesta</h3>'
+  +'<p><strong>Diagnóstico:</strong> '+dx+'</p>'
+  +'<p><strong>Procedimiento:</strong> '+cir+' | <strong>Especialidad:</strong> '+esp+' | <strong>Urgencia:</strong> '+(urgMap[urg]||urg)+'</p>'
+  +'<h3>4. Antecedentes Quirúrgicos Previos</h3>'
+  +'<p style="font-size:13px;">'+antecQx+'</p>'
+  +'<h3>5. Antecedentes de Complicaciones Anestésicas / Quirúrgicas</h3>'
+  +(hayComp?'<div style="background:var(--danger-bg);border-left:4px solid var(--danger);padding:10px 14px;border-radius:6px;margin-bottom:8px;font-size:13px;"><strong>⚠ ATENCIÓN:</strong><br>'+antecComp+'</div>':'<p style="font-size:13px;">'+antecComp+'</p>')
+  +'<h3>6. Signos Vitales</h3>'
+  +'<p>TA: '+tas+'/'+tad+' mmHg | FC: '+fc+' lpm | FR: '+fr+' rpm | Temp: '+temp+' °C | SatO2: '+sat+'%</p>'
+  +'<p>Ritmo: '+ritmo+' | Auscultación pulmonar: '+pulm+'</p>'
+  +'<h3>7. Evaluación de Vía Aérea</h3>'
+  +(vadAlerts.length>0?'<div style="background:var(--danger-bg);border-left:4px solid var(--danger);padding:10px 14px;border-radius:6px;margin-bottom:8px;"><strong>⚠ PREDICTORES VAD:</strong> '+vadAlerts.join(' | ')+'</div>':'<p>Sin predictores de VAD para intubación.</p>')
+  +'<p><strong>BEARD (VMD):</strong> '+beardVal+'/5 — <strong>'+beardRiesgo+'</strong></p>'
+  +(beardVal>=2?'<div style="background:var(--danger-bg);border-left:4px solid var(--danger);padding:8px 12px;border-radius:6px;font-size:12px;"><strong>⚠ BEARD ≥2: preparar plan de rescate para VMD. Documentar y notificar al equipo.</strong></div>':'')
+  +'<p style="margin-top:6px;"><strong>STOP-BANG:</strong> '+sbVal+'/8 — '+sbRiesgo+' riesgo SAOS</p>'
+  +'<h3>8. Clasificación de Riesgo</h3>'
+  +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px;">'
+  +'<tr style="background:var(--accent-light);"><th style="padding:8px;text-align:left;border:1px solid var(--border)">Score</th><th style="padding:8px;text-align:center;border:1px solid var(--border)">Resultado</th><th style="padding:8px;text-align:left;border:1px solid var(--border)">Interpretación</th></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">ASA</td><td style="padding:8px;border:1px solid var(--border);text-align:center;font-weight:bold">'+asaVal+'</td><td style="padding:8px;border:1px solid var(--border)">'+getASADesc(asaVal)+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">Grado quirúrgico</td><td style="padding:8px;border:1px solid var(--border);text-align:center;font-weight:bold">'+gradoVal+'</td><td style="padding:8px;border:1px solid var(--border)">'+getGradoDesc(gradoVal)+'</td></tr>'
+  +'<tr style="background:var(--warn-bg);"><td style="padding:8px;border:1px solid var(--border)"><strong>ABCD (H. Rawson)</strong></td><td style="padding:8px;border:1px solid var(--border);text-align:center;font-size:20px;font-weight:bold;color:var(--accent)">'+abcdVal+'</td><td style="padding:8px;border:1px solid var(--border)">'+getABCDDesc(abcdVal)+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">Fragilidad (CFS)</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+cfsVal+'</td><td style="padding:8px;border:1px solid var(--border)">'+cfsLabel+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">DASI</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+dasiVal+' pts</td><td style="padding:8px;border:1px solid var(--border)">METs: '+metsVal+' — '+(metsVal!=='—'&&parseFloat(metsVal)>=4?'ADECUADA':'REDUCIDA')+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">RCRI (Lee)</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+rcriVal+' pts</td><td style="padding:8px;border:1px solid var(--border)">'+rcriDesc+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">BEARD (VMD)</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+beardVal+'/5</td><td style="padding:8px;border:1px solid var(--border)">'+beardRiesgo+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">CAPRINI (TEV)</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+capVal+' pts</td><td style="padding:8px;border:1px solid var(--border)">'+capRiesgo+'</td></tr>'
+  +'<tr><td style="padding:8px;border:1px solid var(--border)">PONS</td><td style="padding:8px;border:1px solid var(--border);text-align:center">'+ponsN+'/4</td><td style="padding:8px;border:1px solid var(--border)">'+(ponsN>0?'POSITIVO':'Negativo')+'</td></tr>'
+  +'</table>'
+  +'<h3>9. Laboratorio y Estudios</h3>'
+  +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;"><tr style="background:var(--accent-light);"><th style="padding:6px 8px;border:1px solid var(--border)">Parámetro</th><th style="padding:6px 8px;border:1px solid var(--border)">Valor</th><th style="padding:6px 8px;border:1px solid var(--border)">Parámetro</th><th style="padding:6px 8px;border:1px solid var(--border)">Valor</th></tr>'
+  +'<tr><td style="padding:6px 8px;border:1px solid var(--border)">Hemoglobina</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+hb+' g/dl</td><td style="padding:6px 8px;border:1px solid var(--border)">Ferritina</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+ferr+' ng/ml</td></tr>'
+  +'<tr><td style="padding:6px 8px;border:1px solid var(--border)">Glucemia ayunas</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+gluc+' mg/dl</td><td style="padding:6px 8px;border:1px solid var(--border)">HbA1c</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+hba1c+'%</td></tr>'
+  +'<tr><td style="padding:6px 8px;border:1px solid var(--border)">Creatinina</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+creat+' mg/dl</td><td style="padding:6px 8px;border:1px solid var(--border)">Albúmina</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+alb+' g/dl</td></tr>'
+  +'<tr><td style="padding:6px 8px;border:1px solid var(--border)">IST Transferrina</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+ist+'%</td><td style="padding:6px 8px;border:1px solid var(--border)">FEyVI</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+fevi+'%</td></tr>'
+  +'<tr><td style="padding:6px 8px;border:1px solid var(--border)">FEV1 (% predicho)</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+fev1p+'%</td><td style="padding:6px 8px;border:1px solid var(--border)">DLCO (% predicho)</td><td style="padding:6px 8px;border:1px solid var(--border);text-align:center">'+dlco+'%</td></tr>'
+  +'</table>'
+  +'<p style="font-size:12px;"><strong>ECG:</strong> '+ecg+'</p><p style="font-size:12px;"><strong>Ecocardiograma:</strong> '+eco+'</p><p style="font-size:12px;"><strong>Ergometría:</strong> '+ergo+'</p><p style="font-size:12px;"><strong>Rx Tórax:</strong> '+rx+'</p>'
+  +'<h3>10. Conclusión y Riesgo Anestésico</h3>'
+  +(conclusionTxt?'<div class="result-box '+conclusionCls+'"><div class="rb-title">ABCD: '+abcdVal+' — '+getABCDDesc(abcdVal)+'</div><div class="rb-text">'+conclusionTxt+'</div></div>':'<div class="result-box info"><div class="rb-text">Complete los pasos anteriores.</div></div>')
+  +'<h3>11. Plan de Prehabilitación</h3>'
+  +'<ul><li><strong>Ejercicio:</strong> '+ejercicio+'</li><li><strong>Nutrición:</strong> '+nutricion+'</li><li><strong>Psicológico:</strong> '+psico+'</li><li><strong>Tabaquismo:</strong> '+getTabacoDesc(tabaco)+'</li><li><strong>Alcohol:</strong> '+getAlcoholDesc(alcohol)+'</li><li><strong>Profilaxis antibiótica:</strong> '+antibiotico+'</li></ul>'
+  +'<h3>12. Interconsultas</h3><p>'+interconsultas+'</p>'
+  +(recomendaciones?'<h3>13. Recomendaciones adicionales</h3><p>'+recomendaciones+'</p>':'')
+  +'<hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">'
+  +'<p style="font-size:11px;color:var(--text3)">Sistema de Medicina Perioperatoria — Hospital Guillermo Rawson. Fecha: '+fecha+'. Evaluador: '+medico+'. Este informe no reemplaza el criterio clínico del equipo tratante.</p>';
+  document.getElementById('informe-output').innerHTML=html;
+}
+
+// INIT
+document.getElementById('p_fecha').value=new Date().toISOString().split('T')[0];
+document.getElementById('p_peso').addEventListener('input',calcIMC);
+document.getElementById('p_talla').addEventListener('input',calcIMC);
+(function(){var h=document.createElement('div');h.style.cssText='display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:4px;padding:0 2px;';h.innerHTML='<span style="font-size:11px;font-weight:600;color:var(--text3)">Medicamento</span><span style="font-size:11px;font-weight:600;color:var(--text3)">Dosis</span><span style="font-size:11px;font-weight:600;color:var(--text3)">Indicación</span><span style="font-size:11px;font-weight:600;color:var(--text3)">Manejo</span>';var ml=document.getElementById('med-list');ml.insertBefore(h,ml.firstChild);})();
+</script>
+</body>
+</html>
